@@ -171,7 +171,9 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(computeConvexDecomposition_overloads, computeCon
 
 OPENRAVE_PYTHON_MODULE(convexdecompositionpy)
 {
-    import_array();
+#ifndef USE_PYBIND11_PYTHON3_BINDINGS
+    import_array(); // not sure if this is necessary for pybind11
+#endif
 #ifndef USE_PYBIND11_PYTHON_BINDINGS
     numeric::array::set_module_and_type("numpy", "ndarray");
     int_from_number<int>();

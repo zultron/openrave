@@ -88,11 +88,20 @@ include(InstallSymlink)
 find_package(PkgConfig) # pkg_check_modules
 
 set(OPENRAVE_PYTHON_INSTALL_DIR)
-
+set(USE_PYBIND11_PYTHON3_BINDINGS ON CACHE BOOL "Build OpenRAVE's python bindings with pybind11 in python3 (ON) or python2 (OFF)")
+if(USE_PYBIND11_PYTHON3_BINDINGS)
+  set(PYTHON_EXECUTABLE /usr/bin/python3)
+else()
+  set(PYTHON_EXECUTABLE /usr/bin/python)
+endif()
 if( OPT_PYTHON )
   include(FindPythonInterp)
   ## check python
-  find_package(PythonLibs 2) # using PYTHON_INCLUDE_PATH instead of PYTHON_INCLUDE_DIRS?
+  if(USE_PYBIND11_PYTHON3_BINDINGS)
+    find_package(PythonLibs 3 COMPONENTS Interpreter Development)
+  else()
+    find_package(PythonLibs 2 COMPONENTS Interpreter Development) # using PYTHON_INCLUDE_PATH instead of PYTHON_INCLUDE_DIRS?
+  endif()
   if( NOT PYTHON_EXECUTABLE )
     # look specifically for 2.6
     find_program(PYTHON_EXECUTABLE NAMES python2.6 python PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath])
@@ -102,6 +111,8 @@ if( OPT_PYTHON )
   if( NOT PYTHON_INCLUDE_DIRS )
     set(PYTHON_INCLUDE_DIRS ${PYTHON_INCLUDE_PATH})
   endif()
+
+  message(STATUS "PYTHON_EXECUTABLE = ${PYTHON_EXECUTABLE}")
 
   if( PYTHON_EXECUTABLE )
     get_filename_component(PYTHON_EXECUTABLE_NAME ${PYTHON_EXECUTABLE} NAME)
@@ -116,11 +127,13 @@ if( OPT_PYTHON )
 #      OUTPUT_VARIABLE _python_distpackage OUTPUT_STRIP_TRAILING_WHITESPACE
 #      RESULT_VARIABLE _python_failed1)
     execute_process(
-      COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print numpy.get_include()"
+      COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.get_include())"
       OUTPUT_VARIABLE _python_numpy_include OUTPUT_STRIP_TRAILING_WHITESPACE
       RESULT_VARIABLE _python_failed0)
     execute_process(
-      COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; from myrelpath import relpath; print relpath(get_python_lib(1,prefix='${CMAKE_INSTALL_PREFIX}'),'${CMAKE_INSTALL_PREFIX}')"
+      COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib;\
+      import os;\
+      print(os.path.relpath(get_python_lib(1,prefix='${CMAKE_INSTALL_PREFIX}'), '${CMAKE_INSTALL_PREFIX}'))"
       OUTPUT_VARIABLE OPENRAVE_PYTHON_INSTALL_DIR OUTPUT_STRIP_TRAILING_WHITESPACE
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       RESULT_VARIABLE _python_failed2)

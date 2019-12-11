@@ -2389,7 +2389,9 @@ void MyThrow() {
 OPENRAVE_PYTHON_MODULE(openravepy_int)
 {
     using namespace openravepy;
+#ifndef USE_PYBIND11_PYTHON3_BINDINGS
     import_array(); // not sure if this is necessary for pybind11
+#endif
 #ifdef USE_PYBIND11_PYTHON_BINDINGS
     using namespace py::literals; // "..."_a
 #else // USE_PYBIND11_PYTHON_BINDINGS

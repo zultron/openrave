@@ -328,7 +328,9 @@ object k_priority_search_array(ANNkd_tree& kdtree, object q, int k, double eps)
 
 OPENRAVE_PYTHON_MODULE(pyANN_int)
 {
-    import_array();
+#ifndef USE_PYBIND11_PYTHON3_BINDINGS
+    import_array(); // not sure if this is necessary for pybind11
+#endif
 #ifdef USE_PYBIND11_PYTHON_BINDINGS
     using namespace py::literals; // "..."_a
     class_< pyann_exception >(m, "_pyann_exception_" )

@@ -18,6 +18,7 @@
 #ifndef OPENRAVE_BOOST_PYTHON_BINDINGS
 #define OPENRAVE_BOOST_PYTHON_BINDINGS
 
+#include <Python.h>
 #include <stdint.h>
 // numpy
 #include <numpy/arrayobject.h>
@@ -337,6 +338,17 @@ inline py::object ConvertStringToUnicode(const std::string& s)
 #endif
 }
 
+#if defined(USE_PYBIND11_PYTHON_BINDINGS) && defined(USE_PYBIND11_PYTHON3_BINDINGS)
+// https://py3c.readthedocs.io/en/latest/reference.html
+// https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_AsUTF8
+inline const char* PyString_AsString(PyObject* pystring) { return PyUnicode_AsUTF8(pystring); }
+inline bool PyInt_Check(const PyObject* o) { return PyLong_Check(o); }
+inline long PyInt_AsLong(PyObject* o) { return PyLong_AsLong(o); }
+inline bool PyString_Check(PyObject* o) { return PyUnicode_Check(o); }
+inline Py_ssize_t PyString_GET_SIZE(PyObject *o) { return PyBytes_GET_SIZE(o); }
+inline PyObject* PyString_FromStringAndSize(const char *u, Py_ssize_t len) { return PyUnicode_FromStringAndSize(u, len); }
+#endif // defined(USE_PYBIND11_PYTHON_BINDINGS) && defined(USE_PYBIND11_PYTHON3_BINDINGS)
+
 class PyVoidHandle
 {
 public:
@@ -497,23 +509,22 @@ struct int_from_number
 
 inline std::string GetPyErrorString()
 {
-    PyObject *error, *value, *traceback, *string;
+    PyObject *error, *value, *traceback, *str;
     PyErr_Fetch(&error, &value, &traceback);
     PyErr_NormalizeException(&error, &value, &traceback);
-    std::string s;
+    std::string s_out;
     if(error != nullptr) {
-        string = PyObject_Str(value);
-        if(string != nullptr) {
-            s.assign(PyString_AsString(string));
-            Py_DECREF(string);
+        str = PyObject_Str(value);
+        if(str != nullptr) {
+            s_out.assign(PyString_AsString(str));
+            Py_DECREF(str);
         }
     }
     // Does nothing when the ptr is nullptr
     Py_DECREF(error);
     Py_DECREF(value);
     Py_DECREF(traceback);
-
-    return s;
+    return s_out;
 }
 
 /// should call in the beginning of all BOOST_PYTHON_MODULE
