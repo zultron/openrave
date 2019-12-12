@@ -11,13 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License. 
-from __future__ import with_statement # for python 2.5
-import openravepy_int
+from . import openravepy_int
 import numpy
-try:
-    import cPickle as pickle
-except:
-    import pickle
+import pickle
 
 import logging
 log = logging.getLogger('openravepy')
@@ -25,7 +21,7 @@ log = logging.getLogger('openravepy')
 # https://github.com/pybind/pybind11/issues/253
 def enum_to_dict(enum):
     import re
-    return {k: v for k, v in enum.__dict__.iteritems() if not re.match("__(.*)__", str(k))}
+    return {k: v for k, v in enum.__dict__.items() if not re.match("__(.*)__", str(k))}
 
 def KinBodyStateSaver(body,options=None):
     log.warn('use body.CreateKinBodyStateSaver instead of KinBodyStateSaver')
@@ -86,7 +82,7 @@ def _tuple2enum(enum, value):
 #    return isinstance(o, type) and issubclass(o,int) and not (o is int)
 
 def _registerEnumPicklers(): 
-    from copy_reg import constructor, pickle
+    from copyreg import constructor, pickle
     def reduce_enum(e):
         enum = type(e).__name__.split('.')[-1]
         return ( _tuple2enum, ( enum, int(e) ) )
@@ -95,7 +91,8 @@ def _registerEnumPicklers():
     #for e in [ e for e in vars(openravepy).itervalues() if isEnumType(e) ]:
     #    pickle(e, reduce_enum)
 
-_registerEnumPicklers()
+if openravepy_int.__pythonbinding__ != 'pybind11':
+    _registerEnumPicklers()
 
 import atexit
 atexit.register(openravepy_int.RaveDestroy)
@@ -108,7 +105,7 @@ class openrave_exception_helper(Exception):
     def __str__( self ):
         return str(self._pimpl)
     def __unicode__( self ):
-        return unicode(self._pimpl)
+        return str(self._pimpl)
     def __getattribute__(self, attr):
         my_pimpl = super(openrave_exception_helper, self).__getattribute__("_pimpl")
         try:
@@ -148,26 +145,26 @@ class runtime_error(Exception):
             return super(runtime_error,self).__getattribute__(attr)
         
 class PlanningError(Exception):
-    def __init__(self,parameter=u'', recoverySuggestions=None):
+    def __init__(self,parameter='', recoverySuggestions=None):
         """:param recoverySuggestions: list of unicode suggestions to fix or recover from the error
         """
-        self.parameter = unicode(parameter)
+        self.parameter = str(parameter)
         if recoverySuggestions is None:
             self.recoverySuggestions = []
         else:
-            self.recoverySuggestions = [unicode(s) for s in recoverySuggestions]
+            self.recoverySuggestions = [str(s) for s in recoverySuggestions]
             
     def __unicode__(self):
-        s = u'Planning Error\n%s'%self.parameter
+        s = 'Planning Error\n%s'%self.parameter
         if len(self.recoverySuggestions) > 0:
-            s += u'\nRecovery Suggestions:\n'
+            s += '\nRecovery Suggestions:\n'
             for suggestion in self.recoverySuggestions:
-                s += u'- %s\n'%unicode(suggestion)
-            s += u'\n'
+                s += '- %s\n'%str(suggestion)
+            s += '\n'
         return s
         
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return str(self).encode('utf-8')
     
     def __repr__(self):
         return '<openravepy.PlanningError(%r,%r)>'%(self.parameter,self.recoverySuggestions)

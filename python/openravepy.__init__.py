@@ -22,7 +22,7 @@ There is a __build_doc__ external variable that is set to True only when buildin
 """
 try:
     if __openravepy_build_doc__:
-        print 'openravepy imported in documentation mode'
+        print('openravepy imported in documentation mode')
 except NameError:
     __builtins__['__openravepy_build_doc__'] = False
 
@@ -58,9 +58,6 @@ else:
     from .openravepy_int import _openrave_exception_
     from .openravepy_ext import openrave_exception
     _openrave_exception_.py_err_class = openravepy_ext.openrave_exception
-
-# deprecated
-Problem = Module
 
 # would "from openravepy import *" be slower if this is enabled?
 #__all__ = ["interfaces", "databases", "metaclass", "openravepy_int"]
