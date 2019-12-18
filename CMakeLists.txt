@@ -95,7 +95,9 @@ else()
   set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python2)
 endif()
 if( OPT_PYTHON )
-  include(FindPythonInterp)
+  set(PYTHON_EXECUTABLE_BACKUP ${PYTHON_EXECUTABLE}) # backup
+  include(FindPythonInterp) # this messed up ${PYTHON_EXECUTABLE}
+  set(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE_BACKUP}) # restore
   ## check python
   set(PYTHONLIBS_FOUND FALSE)
   if(USE_PYBIND11_PYTHON3_BINDINGS)
