@@ -18,6 +18,10 @@ endif()
 set(SUCCESS_BUILD_PYTHON_BINDINGS ON)
 
 if(USE_PYBIND11_PYTHON_BINDINGS)
+  # find PythonInterp again due to old cmake version
+  set(PYTHON_EXECUTABLE_BACKUP ${PYTHON_EXECUTABLE}) # backup
+  include(FindPythonInterp) # this messed up ${PYTHON_EXECUTABLE}
+  set(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE_BACKUP}) # restore
   # check if all header files can be included
   set(PYTHON_INCLUDE_DIRS_BACKUP ${PYTHON_INCLUDE_DIRS}) # backup
   find_package(pybind11 REQUIRED) # this messed up ${PYTHON_INCLUDE_DIRS}

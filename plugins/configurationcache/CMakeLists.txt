@@ -30,6 +30,10 @@ if( HAVE_ALL_PYTHON_HEADERS )
     endif()
     # pybind11 requires less visibility
     set(OPENRAVEPY_CONFIGURATIONCACHE_COMPILE_FLAGS "${OPENRAVEPY_CONFIGURATIONCACHE_COMPILE_FLAGS} -fvisibility=hidden")
+
+    if(USE_PYBIND11_PYTHON3_BINDINGS)
+      set(OPENRAVEPY_CONFIGURATIONCACHE_COMPILE_FLAGS "${OPENRAVEPY_CONFIGURATIONCACHE_COMPILE_FLAGS} -DUSE_PYBIND11_PYTHON3_BINDINGS")
+    endif()
   else()
     message(STATUS "Build openravepy_configurationcache with Boost.Python")
   endif()

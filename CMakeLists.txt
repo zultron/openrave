@@ -97,11 +97,15 @@ endif()
 if( OPT_PYTHON )
   include(FindPythonInterp)
   ## check python
+  set(PYTHONLIBS_FOUND FALSE)
   if(USE_PYBIND11_PYTHON3_BINDINGS)
     find_package(PythonLibs 3 COMPONENTS Interpreter Development)
-  else()
+  endif()
+  if(NOT PYTHONLIBS_FOUND)
+    set(USE_PYBIND11_PYTHON3_BINDINGS FALSE)
     find_package(PythonLibs 2 COMPONENTS Interpreter Development) # using PYTHON_INCLUDE_PATH instead of PYTHON_INCLUDE_DIRS?
   endif()
+  message(STATUS "OPENRAVE_PYTHON_VERSION_STRING = ${PYTHONLIBS_VERSION_STRING}")
   if( NOT PYTHON_EXECUTABLE )
     # look specifically for 2.6
     find_program(PYTHON_EXECUTABLE NAMES python2.6 python PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath])
@@ -825,7 +829,7 @@ if(OPT_PYTHON AND PYTHON_EXECUTABLE)
   if( PYTHON_EXECUTABLE )
     # get the sympy version
     execute_process(
-      COMMAND ${PYTHON_EXECUTABLE} -c "import sympy; print sympy.__version__"
+      COMMAND ${PYTHON_EXECUTABLE} -c "import sympy; print(sympy.__version__)"
       OUTPUT_VARIABLE _sympy_version OUTPUT_STRIP_TRAILING_WHITESPACE
       RESULT_VARIABLE _sympy_version_failed)
     if( ${_sympy_version_failed} EQUAL 0 )
