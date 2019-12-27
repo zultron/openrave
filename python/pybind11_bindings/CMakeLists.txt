@@ -26,32 +26,30 @@ if(USE_PYBIND11_PYTHON_BINDINGS)
   set(PYTHON_INCLUDE_DIRS_BACKUP ${PYTHON_INCLUDE_DIRS}) # backup
   find_package(pybind11 REQUIRED) # this messed up ${PYTHON_INCLUDE_DIRS}
   set(PYTHON_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS_BACKUP}) # restore
-  add_definitions(${Boost_CFLAGS})
-  set(CMAKE_REQUIRED_INCLUDES ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${REQUIRED_INCLUDES})
-  set(CMAKE_REQUIRED_LIBRARIES ${PYTHON_LIBRARIES} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  set(CMAKE_REQUIRED_FLAGS ${Boost_CFLAGS} "-DCMAKE_BUILD_TYPE:STRING=Release")
+  # add_definitions(${Boost_CFLAGS})
+  # set(CMAKE_REQUIRED_INCLUDES ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${REQUIRED_INCLUDES})
+  # set(CMAKE_REQUIRED_LIBRARIES ${PYTHON_LIBRARIES})
+  # set(CMAKE_REQUIRED_FLAGS ${Boost_CFLAGS} "-DCMAKE_BUILD_TYPE:STRING=Release")
   check_cxx_source_runs("
     // python
-    #include <Python.h>
-    #include <pyconfig.h>
-    // numpy
-    #include <numpy/arrayobject.h>
-    #include <numpy/arrayscalars.h>
     // pybind11
-    #include <pybind11/pybind11.h>
-    #include <pybind11/stl.h>
-    #include <pybind11/numpy.h>
+    // #include <pybind11/pybind11.h>
+    // #include <pybind11/stl.h>
+    // #include <pybind11/numpy.h>
     // #include <pybind11/eigen.h> // requires Eigen3 and include ${CMAKE_INSTALL_PREFIX}/include/eigen3
     int main() { return 0; }
   "
   HAVE_ALL_PYTHON_HEADERS)
+  set(HAVE_ALL_PYTHON_HEADERS ON)
   set(HAVE_ALL_PYTHON_HEADERS ${HAVE_ALL_PYTHON_HEADERS} PARENT_SCOPE)
 
   if(NOT HAVE_ALL_PYTHON_HEADERS)
     message(FATAL_ERROR "Should have installed pybind11; CMake will exit.")
   endif()
 
+  message(STATUS "HAVE_ALL_PYTHON_HEADERS = ${HAVE_ALL_PYTHON_HEADERS}")
   if( HAVE_ALL_PYTHON_HEADERS )
+    set(CMAKE_REQUIRED_LIBRARIES ${PYTHON_LIBRARIES} ${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY})
     # include
     include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_INCLUDE_DIRS} ${OPENRAVE_INCLUDE_LOCAL_DIRS} ${OPENRAVE_CORE_INCLUDE_LOCAL_DIRS})
     add_definitions("-DUSE_PYBIND11_PYTHON_BINDINGS")
@@ -129,6 +127,7 @@ if(USE_PYBIND11_PYTHON_BINDINGS)
     message(STATUS "failed to find pybind11, please install")
     set(SUCCESS_BUILD_PYTHON_BINDINGS OFF)
   endif()
+  message(STATUS "Finished configuration of openravepy_int, pyANN_int, and convexdecompositionpy")
 
 elseif( Boost_PYTHON_FOUND AND Boost_THREAD_FOUND )
   add_definitions(${Boost_CFLAGS})

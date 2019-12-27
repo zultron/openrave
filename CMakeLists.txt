@@ -89,11 +89,48 @@ find_package(PkgConfig) # pkg_check_modules
 
 set(OPENRAVE_PYTHON_INSTALL_DIR)
 set(USE_PYBIND11_PYTHON3_BINDINGS ON CACHE BOOL "Build OpenRAVE's python bindings with pybind11 in python3 (ON) or python2 (OFF)")
-if(USE_PYBIND11_PYTHON3_BINDINGS)
-  set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python3)
+
+if(APPLE)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
+  set(Python3_ROOT ${Python3_INCLUDE_DIR}/../..)
+
+  find_package(Boost COMPONENTS regex filesystem system thread iostreams date_time python REQUIRED)
+  message(STATUS "Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
+  message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
+  message(STATUS "Boost_LIBRARY_DIRS = ${Boost_LIBRARY_DIRS}")
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+
+  set(Boost_THREAD_LIBRARY ${Boost_LIBRARY_DIRS}/libboost_thread-mt.dylib)
+  set(Python3_NUMPY_INCLUDE_DIR "${Python3_SITELIB}/numpy/core/include")
+  set(Python3_NUMPY_LIBRARY_DIR "${Python3_SITELIB}/numpy/core/lib")
+
+  string(REGEX MATCH "3.([0-9]+).([0-9]+)" python3_version_match "${Python3_VERSION}")
+  set(Python3_MINOR_VERSION "${CMAKE_MATCH_1}")
+  set(Python3_PATCH_VERSION "${CMAKE_MATCH_2}")
+
+  message(STATUS "=======================================================")
+  message(STATUS "Python3_ROOT              = ${Python3_ROOT}")
+  message(STATUS "Python3_MINOR_VERSION     = ${Python3_MINOR_VERSION}")
+  message(STATUS "Python3_PATCH_VERSION     = ${Python3_PATCH_VERSION}")
+  message(STATUS "Python3_EXECUTABLE        = ${Python3_EXECUTABLE}")
+  message(STATUS "Python3_INCLUDE_DIR       = ${Python3_INCLUDE_DIR}")
+  message(STATUS "Python3_LIBRARY           = ${Python3_LIBRARY}")
+  message(STATUS "Python3_SITELIB           = ${Python3_SITELIB}")
+  message(STATUS "Python3_FOUND             = ${Python3_FOUND}")
+  message(STATUS "Python3_NUMPY_INCLUDE_DIR = ${Python3_NUMPY_INCLUDE_DIR}")
+  message(STATUS "Python3_NUMPY_LIBRARY_DIR = ${Python3_NUMPY_LIBRARY_DIR}")
+  message(STATUS "=======================================================")
+
+  set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
 else()
-  set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python2)
+  if(USE_PYBIND11_PYTHON3_BINDINGS)
+    set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python3)
+  else()
+    set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python2)
+  endif()
 endif()
+
 if( OPT_PYTHON )
   set(PYTHON_EXECUTABLE_BACKUP ${PYTHON_EXECUTABLE}) # backup
   include(FindPythonInterp) # this messed up ${PYTHON_EXECUTABLE}
@@ -210,6 +247,7 @@ set(OPENRAVE_INCLUDE_LOCAL_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(OPENRAVEPY_INCLUDE_LOCAL_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/python/pybind11_bindings)
 
 # need this in the very first include, otherwise openrave plugins can accidentaly compile with a system-installed openrave headers.
+include_directories(${CMAKE_INSTALL_PREFIX}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 include_directories(${OPENRAVE_INCLUDE_LOCAL_DIRS}) # needed since plugins include openrave/openrave.h
 

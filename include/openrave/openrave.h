@@ -43,10 +43,10 @@
 
 #ifndef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCDNAME__
-#endif
+#endif // __PRETTY_FUNCTION__
 
 #else
-#endif
+#endif // _MSC_VER
 
 #include <string>
 #include <vector>
@@ -79,13 +79,13 @@
 #include <boost/multi_array.hpp>
 //#include <boost/cstdint.hpp>
 
-#endif
+#endif // Q_MOC_RUN
 
 #if defined(__GNUC__)
 #define RAVE_DEPRECATED __attribute__((deprecated))
 #else
 #define RAVE_DEPRECATED
-#endif
+#endif // defined(__GNUC__)
 
 #include <openrave/smart_ptr.h>
 
