@@ -2,6 +2,7 @@
 set (openrave_SOURCES openrave.cpp)
 
 include_directories(${OPENRAVE_INCLUDE_LOCAL_DIRS})
+include_directories(${CMAKE_INSTALL_PREFIX}/include)
 
 set(openrave_libraries ${LIBXML2_LIBRARIES} ${Boost_DATE_TIME_LIBRARY} ${Boost_THREAD_LIBRARY} openrave-md5)
 if( Boost_FILESYSTEM_FOUND AND Boost_SYSTEM_FOUND )

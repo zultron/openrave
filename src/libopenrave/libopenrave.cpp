@@ -25,7 +25,9 @@
 #ifndef _WIN32
 #include <sys/stat.h>
 #include <sys/types.h>
+#if !defined(__APPLE__)
 #include <libintl.h>
+#endif
 #endif
 
 #include <locale>
@@ -1356,7 +1358,7 @@ std::string RaveGetDefaultViewerType()
 
 const char *RaveGetLocalizedTextForDomain(const std::string& domainname, const char *msgid)
 {
-#ifndef _WIN32
+#if !(defined(_WIN32) || defined(__APPLE__))
     if (_gettextDomainsInitialized.find(domainname) == _gettextDomainsInitialized.end())
     {
         bindtextdomain(domainname.c_str(), OPENRAVE_LOCALE_INSTALL_DIR);
