@@ -26,12 +26,17 @@ if(USE_PYBIND11_PYTHON_BINDINGS)
   set(PYTHON_INCLUDE_DIRS_BACKUP ${PYTHON_INCLUDE_DIRS}) # backup
   find_package(pybind11 REQUIRED) # this messed up ${PYTHON_INCLUDE_DIRS}
   set(PYTHON_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS_BACKUP}) # restore
-  # add_definitions(${Boost_CFLAGS})
-  # set(CMAKE_REQUIRED_INCLUDES ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${REQUIRED_INCLUDES})
-  # set(CMAKE_REQUIRED_LIBRARIES ${PYTHON_LIBRARIES})
-  # set(CMAKE_REQUIRED_FLAGS ${Boost_CFLAGS} "-DCMAKE_BUILD_TYPE:STRING=Release")
+  add_definitions(${Boost_CFLAGS})
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_INSTALL_PREFIX}/include ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${REQUIRED_INCLUDES})
+  set(CMAKE_REQUIRED_LIBRARIES ${PYTHON_LIBRARIES})
+  set(CMAKE_REQUIRED_FLAGS ${Boost_CFLAGS} "-DCMAKE_BUILD_TYPE:STRING=Release")
   check_cxx_source_runs("
     // python
+    // #include <Python.h>
+    // #include <pyconfig.h>
+    // numpy
+    // #include <numpy/arrayobject.h>
+    // #include <numpy/arrayscalars.h>
     // pybind11
     // #include <pybind11/pybind11.h>
     // #include <pybind11/stl.h>

@@ -90,18 +90,21 @@ find_package(PkgConfig) # pkg_check_modules
 set(OPENRAVE_PYTHON_INSTALL_DIR)
 set(USE_PYBIND11_PYTHON3_BINDINGS ON CACHE BOOL "Build OpenRAVE's python bindings with pybind11 in python3 (ON) or python2 (OFF)")
 
+set(Boost_THREAD_LIBRARY)
 if(APPLE)
   find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
   set(Python3_ROOT ${Python3_INCLUDE_DIR}/../..)
 
   find_package(Boost COMPONENTS regex filesystem system thread iostreams date_time python REQUIRED)
-  message(STATUS "Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
+  message(STATUS "Before: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
+  message(STATUS "Boost_FOUND = ${Boost_FOUND}")
   message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
   message(STATUS "Boost_LIBRARY_DIRS = ${Boost_LIBRARY_DIRS}")
   include_directories(${Boost_INCLUDE_DIRS})
   link_directories(${Boost_LIBRARY_DIRS})
 
   set(Boost_THREAD_LIBRARY ${Boost_LIBRARY_DIRS}/libboost_thread-mt.dylib)
+  message(STATUS " After: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
   set(Python3_NUMPY_INCLUDE_DIR "${Python3_SITELIB}/numpy/core/include")
   set(Python3_NUMPY_LIBRARY_DIR "${Python3_SITELIB}/numpy/core/lib")
 
@@ -372,7 +375,9 @@ if(NOT MSVC71 AND NOT MSVC80)
     set(Boost_LIBRARY_DIRS $ENV{BOOST_LIBRARYDIR})
   endif()
   set(Boost_ADDITIONAL_VERSIONS "1.46.1" "1.45" "1.44" "1.43" "1.42" "1.41" "1.40" "1.39" "1.38" "1.37.0" "1.37" "1.35.0" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33" ${Boost_ADDITIONAL_VERSIONS})
-  find_package(Boost COMPONENTS regex filesystem system python thread iostreams date_time)
+  if(NOT Boost_FOUND)
+    find_package(Boost COMPONENTS regex filesystem system python thread iostreams date_time)
+  endif()
 else()
   # have to rely on local boost and a hack
   add_definitions(-DTEMP_SPIRIT_HACK)
