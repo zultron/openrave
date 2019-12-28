@@ -199,7 +199,7 @@ QtOSGViewer::~QtOSGViewer()
 
 void QtOSGViewer::_InitGUI(bool bCreateStatusBar, bool bCreateMenu)
 {
-    osg::ArgumentParser arguments(0, NULL);
+    // osg::ArgumentParser arguments(0, NULL);
 
     if( !QApplication::instance() ) {
         RAVELOG_WARN("no app instance to attach close\n");

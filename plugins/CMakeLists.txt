@@ -37,6 +37,7 @@ set(CPACK_COMPONENT_${PLUGINS_BASE_UPPER}_DEPENDS ${COMPONENT_PREFIX}base PARENT
 set(PLUGIN_COMPONENTS ${PLUGINS_BASE})
 
 set(PLUGINS basecontrollers baserobots basesamplers basesensors bulletrave mobyrave configurationcache grasper ikfastsolvers logging pqprave rmanipulation rplanners textserver)
+# brew install qt open-scene-graph
 if( OPT_QTOSG_VIEWER )
   set(PLUGINS ${PLUGINS} qtosgrave)
 endif()
