@@ -29,27 +29,31 @@ if(USE_PYBIND11_PYTHON_BINDINGS)
   add_definitions(${Boost_CFLAGS})
   set(CMAKE_REQUIRED_INCLUDES ${CMAKE_INSTALL_PREFIX}/include ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${REQUIRED_INCLUDES})
   set(CMAKE_REQUIRED_LIBRARIES ${PYTHON_LIBRARIES})
-  set(CMAKE_REQUIRED_FLAGS ${Boost_CFLAGS} "-DCMAKE_BUILD_TYPE:STRING=Release")
+  set(CMAKE_REQUIRED_FLAGS ${Boost_CFLAGS} "-std=c++11 -DCMAKE_BUILD_TYPE:STRING=Release")
+
+  message(STATUS "Performing HAVE_ALL_PYTHON_HEADERS test")
+  message(STATUS "CMAKE_REQUIRED_INCLUDES  = ${CMAKE_REQUIRED_INCLUDES}")
+  message(STATUS "CMAKE_REQUIRED_LIBRARIES = ${CMAKE_REQUIRED_LIBRARIES}")
+  message(STATUS "CMAKE_REQUIRED_FLAGS     = ${CMAKE_REQUIRED_FLAGS}")
+
   check_cxx_source_runs("
     // python
-    // #include <Python.h>
-    // #include <pyconfig.h>
+    #include <Python.h>
+    #include <pyconfig.h>
     // numpy
-    // #include <numpy/arrayobject.h>
-    // #include <numpy/arrayscalars.h>
+    #include <numpy/arrayobject.h>
+    #include <numpy/arrayscalars.h>
     // pybind11
-    // #include <pybind11/pybind11.h>
-    // #include <pybind11/stl.h>
-    // #include <pybind11/numpy.h>
+    #include <pybind11/pybind11.h>
+    #include <pybind11/stl.h>
+    #include <pybind11/numpy.h>
     // #include <pybind11/eigen.h> // requires Eigen3 and include ${CMAKE_INSTALL_PREFIX}/include/eigen3
     int main() { return 0; }
   "
   HAVE_ALL_PYTHON_HEADERS)
-  set(HAVE_ALL_PYTHON_HEADERS ON)
   set(HAVE_ALL_PYTHON_HEADERS ${HAVE_ALL_PYTHON_HEADERS} PARENT_SCOPE)
-
   if(NOT HAVE_ALL_PYTHON_HEADERS)
-    message(FATAL_ERROR "Should have installed pybind11; CMake will exit.")
+    message(FATAL_ERROR "Should have installed Python dev, numpy, and pybind11; CMake will exit.")
   endif()
 
   message(STATUS "HAVE_ALL_PYTHON_HEADERS = ${HAVE_ALL_PYTHON_HEADERS}")
