@@ -35,26 +35,44 @@ Install Python3 and Boost on macOS
 ----------------------------------
 * Install Homebrew.
 ```
-$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 See <https://brew.sh/> for more details.
 
 * Install third-party dependencies with Homebrew.
 ```
-$ brew install python3 libxml2 boost boost-python3 qt open-scene-graph
+brew install libxml2 boost qt open-scene-graph
+# explained below
+# brew install python3 boost-python3
 ```
 
-Homebrew installs these packages under `/usr/local/Cellar`. Normally, the header files are linked to `/usr/local/include`, and the libraries are linked to `/usr/local/lib`. Sometimes Homebrew installs a package as "keg-only", that is without linking. Then the user needs to do `brew link` manually; see https://docs.brew.sh/FAQ#what-does-keg-only-mean.
+Homebrew installs these packages under `/usr/local/Cellar`, and links files in the corresponding directories where they belong to:
+- executables are linked to `/usr/local/bin`,
+- header files are linked to `/usr/local/include`, 
+- libraries are linked to `/usr/local/lib`, etc.
+Sometimes Homebrew installs a package as "keg-only", meaning "without linking". Then the user needs to do `brew link` to establish the linkings manually; see
+https://docs.brew.sh/FAQ#what-does-keg-only-mean
 
-A more preferrable way to install Python3 on macOS is using its 64-bit installer (`python-3.x.y-macosx10.9.pkg`), which one can download from https://www.python.org/downloads/mac-osx/. It installs Python3 under 
+* Install Python3.
+One way to install Python3 is by Homebrew: the command
+```
+brew install python3
+```
+installs Python3 under `/usr/local/Cellar` and links files under `/usr/local`. 
+
+However, a more preferrable way is using its 64-bit installer (`python-3.x.y-macosx10.9.pkg`), which one can download from https://www.python.org/downloads/mac-osx/. It installs Python3 under 
 ```
 /Library/Frameworks/Python.framework/Versions/3.x
+```
+Henceforth we use Python3.8 for demostration.
+
+Having installed Python3, we need to install Boost's Python3 module:
+```
+brew install boost-python3
 ```
 
 Install Python3 and Boost on Linux
 ----------------------------------
-* Specify the installation path of `OpenRAVE` by a macro `OPENRAVE_INSTALL_DIR`, similar to in macOS above.
-
 * Install Python3.x and Boost 1.7x
 
 We show how to build Python 3.8 and Boost 1.71 from source files. Other similar versions can be installed analogously.
@@ -85,6 +103,14 @@ Install OpenRAVE-py3
 ```
 echo 'export LD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$LD_LIBRARY_PATH' >> ~/.bashrc
 echo 'export DYLD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$DYLD_LIBRARY_PATH' >> ~/.bashrc
+```
+In macOS, we add Python3 binary directory into `$PATH`.
+```
+export PATH="/Library/Frameworks/Python.framework/Versions/3.8/bin:$PATH"
+```
+Add `site-packages` directory under `$OPENRAVE_INSTALL_DIR` into `PYTHONPATH`:
+```
+export PYTHONPATH="$OPENRAVE_INSTALL_DIR/lib/python3.8/site-packages:$PYTHONPATH"
 ```
 
 - Clone this repository
