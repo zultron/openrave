@@ -1,10 +1,12 @@
-OpenRAVE-py3
-------------
-* This branch allows the user to build OpenRAVE, the Open Robotics Automation Virtual Environment, and its Python3 bindings on macOS and Linux.
+# OpenRAVE-py3
 
+This branch allows the user to build OpenRAVE, the Open Robotics Automation Virtual Environment, and its Python3 bindings on macOS and Linux.
+
+Preparation
+-----------
 * Specify the installation path of `OpenRAVE` by `OPENRAVE_INSTALL_DIR`. 
  
-One can assign this macro during the initialization of terminal, for example, by executing
+One can assign this macro during the shell initialization, for example, by executing
 ```
 echo 'export OPENRAVE_INSTALL_DIR='$HOME'/Projects/openrave' >> ~/.bash_profile
 ```
@@ -16,7 +18,7 @@ when using `zsh` in macOS Catalina.
 
 In Linux, the bash configuration is initialized with `~/.bashrc` instead of `~/.bash_profile`.
 
-* The default cmake arguments are
+* The default cmake arguments of OpenRAVE in production branch are
 ```
 -DODE_USE_MULTITHREAD:BOOL=ON \
   -DOPT_IKFAST_FLOAT32:BOOL=OFF \
@@ -26,7 +28,8 @@ In Linux, the bash configuration is initialized with `~/.bashrc` instead of `~/.
   -DCMAKE_INSTALL_PREFIX=$OPENRAVE_INSTALL_DIR
 ```
 
-* Install `pybind11`: https://github.com/pybind/pybind11 with cmake arguments
+* Use of `pybind11` instead of `Boost.Python` for Python bindings, both Python2 and Python3.
+As `Boost.Python` changes its Numpy API since v1.65 and OpenRAVE's production branch uses `Boost.Python` v1.62 for Python2 bindings, we shall be using `pybind11` (https://github.com/pybind/pybind11) for both Python2/3 bindings. One can install `pybind11` with the following cmake arguments
 ```
 -DPYBIND11_TEST=0 -DCMAKE_INSTALL_PREFIX=$OPENRAVE_INSTALL_DIR
 ```
@@ -47,9 +50,9 @@ brew install libxml2 boost qt open-scene-graph
 ```
 
 Homebrew installs these packages under `/usr/local/Cellar`, and links files in the corresponding directories where they belong to:
-- executables are linked to `/usr/local/bin`,
-- header files are linked to `/usr/local/include`, 
-- libraries are linked to `/usr/local/lib`, etc.
+  * executables are linked to `/usr/local/bin`,
+  * header files are linked to `/usr/local/include`, 
+  * libraries are linked to `/usr/local/lib`, etc.
 Sometimes Homebrew installs a package as "keg-only", meaning "without linking". Then the user needs to do `brew link` to establish the linkings manually; see
 https://docs.brew.sh/FAQ#what-does-keg-only-mean
 
@@ -99,7 +102,7 @@ bash bootstrap.sh --prefix=$OPENRAVE_INSTALL_DIR --with-python=$OPENRAVE_INSTALL
 
 Install OpenRAVE-py3
 --------------------
-- Add the subdirectory `lib` of `OPENRAVE_INSTALL_DIR` into the library search paths by
+* Add the subdirectory `lib` of `OPENRAVE_INSTALL_DIR` into the library search paths by
 ```
 echo 'export LD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$LD_LIBRARY_PATH' >> ~/.bashrc
 echo 'export DYLD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$DYLD_LIBRARY_PATH' >> ~/.bashrc
@@ -108,20 +111,20 @@ In macOS, we add Python3 binary directory into `$PATH`.
 ```
 export PATH="/Library/Frameworks/Python.framework/Versions/3.8/bin:$PATH"
 ```
-Add `site-packages` directory under `$OPENRAVE_INSTALL_DIR` into `PYTHONPATH`:
+Add `site-packages` directory under `$OPENRAVE_INSTALL_DIR` into `$PYTHONPATH`:
 ```
 export PYTHONPATH="$OPENRAVE_INSTALL_DIR/lib/python3.8/site-packages:$PYTHONPATH"
 ```
 
-- Clone this repository
+* Clone this repository
 ```
 git clone git@github.com:rdiankov/openrave.git
 git checkout macOS
 ```
 
-In `CMakeLists.txt`, edit accordingly Python3's version, Boost's version, and installation paths and version numbers of other third-party dependencies. (To be written ...)
+In `CMakeLists.txt`, one edits accordingly Python3's version, Boost's version, and installation paths and version numbers of other third-party dependencies. (To be written ...)
 
-- Build
+* Build OpenRAVE and its Python bindings.
 ```
 cd openrave
 mkdir build
@@ -130,6 +133,7 @@ cmake -DODE_USE_MULTITHREAD:BOOL=ON \
   -DOPT_IKFAST_FLOAT32:BOOL=OFF \
   -DNATIVE_COMPILE_FLAGS:STRING="-march=native -mtune=native" \
   -DOPT_LOG4CXX:BOOL=ON \
+  -DUSE_PYBIND11_PYTHON3_BINDINGS:BOOL=ON \
   -DCMAKE_INSTALL_PREFIX=$OPENRAVE_INSTALL_DIR ..
 make -j4
 make install
