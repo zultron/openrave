@@ -111,7 +111,7 @@ if(APPLE)
   string(REGEX MATCH "3.([0-9]+).([0-9]+)" python3_version_match "${Python3_VERSION}")
   set(Python3_MINOR_VERSION "${CMAKE_MATCH_1}")
   set(Python3_PATCH_VERSION "${CMAKE_MATCH_2}")
-
+  # https://cmake.org/cmake/help/git-stage/module/FindPython3.html
   message(STATUS "=======================================================")
   message(STATUS "Python3_ROOT              = ${Python3_ROOT}")
   message(STATUS "Python3_MINOR_VERSION     = ${Python3_MINOR_VERSION}")
@@ -123,6 +123,7 @@ if(APPLE)
   message(STATUS "Python3_FOUND             = ${Python3_FOUND}")
   message(STATUS "Python3_NUMPY_INCLUDE_DIR = ${Python3_NUMPY_INCLUDE_DIR}")
   message(STATUS "Python3_NUMPY_LIBRARY_DIR = ${Python3_NUMPY_LIBRARY_DIR}")
+  message(STATUS "Python3_NumPy_INCLUDE_DIRS= ${Python3_NumPy_INCLUDE_DIRS}")
   message(STATUS "=======================================================")
 
   set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
@@ -144,7 +145,9 @@ if( OPT_PYTHON )
     find_package(PythonLibs 3 COMPONENTS Interpreter Development)
   endif()
   if(NOT PYTHONLIBS_FOUND)
+    # roll back to python2
     set(USE_PYBIND11_PYTHON3_BINDINGS FALSE)
+    set(USE_PYBIND11_PYTHON_BINDINGS TRUE)
     find_package(PythonLibs 2 COMPONENTS Interpreter Development) # using PYTHON_INCLUDE_PATH instead of PYTHON_INCLUDE_DIRS?
   endif()
   message(STATUS "OPENRAVE_PYTHON_VERSION_STRING = ${PYTHONLIBS_VERSION_STRING}")
