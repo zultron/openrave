@@ -49,10 +49,11 @@ brew install libxml2 boost qt open-scene-graph
 # brew install python3 boost-python3
 ```
 
-Homebrew installs these packages under `/usr/local/Cellar`, and links files in the corresponding directories where they belong to:
+Homebrew installs these packages under `/usr/local/Cellar`, and links files in the corresponding directories where they belong:
   * executables are linked to `/usr/local/bin`,
   * header files are linked to `/usr/local/include`, 
   * libraries are linked to `/usr/local/lib`, etc.
+
 Sometimes Homebrew installs a package as "keg-only", meaning "without linking". Then the user needs to do `brew link` to establish the linkings manually; see
 https://docs.brew.sh/FAQ#what-does-keg-only-mean
 
@@ -102,29 +103,31 @@ bash bootstrap.sh --prefix=$OPENRAVE_INSTALL_DIR --with-python=$OPENRAVE_INSTALL
 
 Install OpenRAVE-py3
 --------------------
-* Add the subdirectory `lib` of `OPENRAVE_INSTALL_DIR` into the library search paths by
+* Add search paths.
+Add the subdirectory `lib` of `$OPENRAVE_INSTALL_DIR` into the library search paths by
 ```
-echo 'export LD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$LD_LIBRARY_PATH' >> ~/.bashrc
-echo 'export DYLD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$DYLD_LIBRARY_PATH' >> ~/.bashrc
+# assume macOS Catalina; please modify accordingly
+echo 'export LD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$LD_LIBRARY_PATH'     >> ~/.zprofile
+echo 'export DYLD_LIBRARY_PATH='$OPENRAVE_INSTALL_DIR/lib':$DYLD_LIBRARY_PATH' >> ~/.zprofile
 ```
 In macOS, we add Python3 binary directory into `$PATH`.
 ```
 export PATH="/Library/Frameworks/Python.framework/Versions/3.8/bin:$PATH"
 ```
-Add `site-packages` directory under `$OPENRAVE_INSTALL_DIR` into `$PYTHONPATH`:
+Add also the Python3 `site-packages` directory inside `$OPENRAVE_INSTALL_DIR` into `$PYTHONPATH`:
 ```
 export PYTHONPATH="$OPENRAVE_INSTALL_DIR/lib/python3.8/site-packages:$PYTHONPATH"
 ```
 
-* Clone this repository
+* Clone this repository and check out this `macOS` branch.
 ```
 git clone git@github.com:rdiankov/openrave.git
 git checkout macOS
 ```
 
-In `CMakeLists.txt`, one edits accordingly Python3's version, Boost's version, and installation paths and version numbers of other third-party dependencies. (To be written ...)
+In `CMakeLists.txt`, one edits accordingly Python3's version, Boost's version, and installation paths and version numbers of other third-party dependencies. (G Tan: to be written ...)
 
-* Build OpenRAVE and its Python bindings.
+* Build OpenRAVE and its Python3 bindings.
 ```
 cd openrave
 mkdir build
