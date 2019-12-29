@@ -6,17 +6,24 @@ OpenRAVE-py3
  
 One can assign this macro during the initialization of terminal, for example, by executing
 ```
-echo 'export OPENRAVE_INSTALL_DIR='$HOME'/Projects/openrave' >> ~/.bashrc
+echo 'export OPENRAVE_INSTALL_DIR='$HOME'/Projects/openrave' >> ~/.bash_profile
 ```
-when using `bash`, or
+when using `bash` in macOS before Catalina, or
 ```
 echo 'export OPENRAVE_INSTALL_DIR='$HOME'/Projects/openrave' >> ~/.zprofile
 ```
-when using `zsh` (e.g. in macOS Catalina).
+when using `zsh` in macOS Catalina.
+
+In Linux, the bash configuration is initialized with `~/.bashrc` instead of `~/.bash_profile`.
 
 * The default cmake arguments are
 ```
--DODE_USE_MULTITHREAD:BOOL=ON -DOPT_IKFAST_FLOAT32:BOOL=OFF -DNATIVE_COMPILE_FLAGS:STRING="-march=native -mtune=native" -DOPT_LOG4CXX:BOOL=ON -DUSE_PYBIND11_PYTHON3_BINDINGS:BOOL=ON -DCMAKE_INSTALL_PREFIX=$OPENRAVE_INSTALL_DIR
+-DODE_USE_MULTITHREAD:BOOL=ON \
+  -DOPT_IKFAST_FLOAT32:BOOL=OFF \
+  -DNATIVE_COMPILE_FLAGS:STRING="-march=native -mtune=native" \
+  -DOPT_LOG4CXX:BOOL=ON \
+  -DUSE_PYBIND11_PYTHON3_BINDINGS:BOOL=ON \
+  -DCMAKE_INSTALL_PREFIX=$OPENRAVE_INSTALL_DIR
 ```
 
 * Install `pybind11`: https://github.com/pybind/pybind11 with cmake arguments
@@ -93,7 +100,11 @@ In `CMakeLists.txt`, edit accordingly Python3's version, Boost's version, and in
 cd openrave
 mkdir build
 cd build
-cmake -DODE_USE_MULTITHREAD:BOOL=ON -DOPT_IKFAST_FLOAT32:BOOL=OFF -DNATIVE_COMPILE_FLAGS:STRING="-march=native -mtune=native" -DOPT_LOG4CXX:BOOL=ON -DCMAKE_INSTALL_PREFIX=$OPENRAVE_INSTALL_DIR ..
+cmake -DODE_USE_MULTITHREAD:BOOL=ON \
+  -DOPT_IKFAST_FLOAT32:BOOL=OFF \
+  -DNATIVE_COMPILE_FLAGS:STRING="-march=native -mtune=native" \
+  -DOPT_LOG4CXX:BOOL=ON \
+  -DCMAKE_INSTALL_PREFIX=$OPENRAVE_INSTALL_DIR ..
 make -j4
 make install
 ```
