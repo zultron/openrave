@@ -92,19 +92,9 @@ set(USE_PYBIND11_PYTHON3_BINDINGS ON CACHE BOOL "Build OpenRAVE's python binding
 
 set(Boost_THREAD_LIBRARY)
 if(APPLE)
+  # Python3
   find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
   set(Python3_ROOT ${Python3_INCLUDE_DIR}/../..)
-
-  find_package(Boost COMPONENTS regex filesystem system thread iostreams date_time python REQUIRED)
-  message(STATUS "Before: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
-  message(STATUS "Boost_FOUND = ${Boost_FOUND}")
-  message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
-  message(STATUS "Boost_LIBRARY_DIRS = ${Boost_LIBRARY_DIRS}")
-  include_directories(${Boost_INCLUDE_DIRS})
-  link_directories(${Boost_LIBRARY_DIRS})
-
-  set(Boost_THREAD_LIBRARY ${Boost_LIBRARY_DIRS}/libboost_thread-mt.dylib)
-  message(STATUS " After: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
   set(Python3_NUMPY_INCLUDE_DIR "${Python3_SITELIB}/numpy/core/include")
   set(Python3_NUMPY_LIBRARY_DIR "${Python3_SITELIB}/numpy/core/lib")
 
@@ -127,13 +117,49 @@ if(APPLE)
   message(STATUS "=======================================================")
 
   set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
-else()
+
+  # Boost
+  find_package(Boost COMPONENTS regex filesystem system thread iostreams date_time python REQUIRED)
+  message(STATUS "Before: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
+  message(STATUS "Boost_FOUND = ${Boost_FOUND}")
+  message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
+  message(STATUS "Boost_LIBRARY_DIRS = ${Boost_LIBRARY_DIRS}")
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+
+  set(Boost_THREAD_LIBRARY ${Boost_LIBRARY_DIRS}/libboost_thread-mt.dylib)
+  message(STATUS " After: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
+else(APPLE)
+  # Python3
   if(USE_PYBIND11_PYTHON3_BINDINGS)
     set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python3)
   else()
     set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python2)
   endif()
-endif()
+  find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
+  message(STATUS "Python3_INCLUDE_DIR = ${Python3_INCLUDE_DIR}")
+
+  # Boost
+  # Ubuntu 18.04 (Bionic)
+  # https://launchpad.net/ubuntu/bionic/+source/cmake
+  # https://cmake.org/cmake/help/v3.10/module/FindBoost.html
+  set(BOOST_ROOT               ${CMAKE_INSTALL_PREFIX})
+  set(BOOST_VERSION            "1.71.0")
+  set(BOOST_INCLUDEDIR         "${BOOST_ROOT}/include")
+  set(BOOST_LIBRARYDIR         "${BOOST_ROOT}/lib")
+  set(Boost_NO_SYSTEM_PATHS ON CACHE BOOL "Force to find using hints")
+  set(BOOST_PYTHON3_LIBRARYDIR "${BOOST_LIBRARYDIR}/libboost_python37")
+  find_package(Boost REQUIRED COMPONENTS regex filesystem system thread iostreams date_time)
+  
+  message(STATUS "Boost_FOUND        = ${Boost_FOUND}")
+  message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
+  message(STATUS "Boost_LIBRARY_DIRS = ${Boost_LIBRARY_DIRS}")
+  message(STATUS "Boost_LIBRARIES    = ${Boost_LIBRARIES}")
+  message(STATUS "Boost_VERSION      = ${Boost_VERSION}")
+  
+  include_directories(${BOOST_INCLUDEDIR} ${LIBXML2_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
+endif(APPLE)
 
 if( OPT_PYTHON )
   set(PYTHON_EXECUTABLE_BACKUP ${PYTHON_EXECUTABLE}) # backup
