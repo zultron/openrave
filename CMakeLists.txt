@@ -225,11 +225,11 @@ if( OPT_PYTHON )
 #      OUTPUT_VARIABLE _python_distpackage OUTPUT_STRIP_TRAILING_WHITESPACE
 #      RESULT_VARIABLE _python_failed1)
     execute_process(
-      COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.get_include())"
+      COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include())"
       OUTPUT_VARIABLE _python_numpy_include OUTPUT_STRIP_TRAILING_WHITESPACE
       RESULT_VARIABLE _python_failed0)
     execute_process(
-      COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib;\
+      COMMAND ${Python3_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib;\
       import os;\
       print(os.path.relpath(get_python_lib(1,prefix='${CMAKE_INSTALL_PREFIX}'), '${CMAKE_INSTALL_PREFIX}'))"
       OUTPUT_VARIABLE OPENRAVE_PYTHON_INSTALL_DIR OUTPUT_STRIP_TRAILING_WHITESPACE
