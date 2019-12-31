@@ -120,24 +120,30 @@ if(APPLE)
 
   # Boost
   find_package(Boost COMPONENTS regex filesystem system thread iostreams date_time python REQUIRED)
-  message(STATUS "Before: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
   message(STATUS "Boost_FOUND = ${Boost_FOUND}")
   message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
   message(STATUS "Boost_LIBRARY_DIRS = ${Boost_LIBRARY_DIRS}")
   include_directories(${Boost_INCLUDE_DIRS})
   link_directories(${Boost_LIBRARY_DIRS})
 
+  message(STATUS "Before: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
   set(Boost_THREAD_LIBRARY ${Boost_LIBRARY_DIRS}/libboost_thread-mt.dylib)
   message(STATUS " After: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
 else(APPLE)
-  # Python3
-  if(USE_PYBIND11_PYTHON3_BINDINGS)
-    set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python3)
-  else()
-    set(PYTHON_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/bin/python2)
-  endif()
-  find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
-  message(STATUS "Python3_INCLUDE_DIR = ${Python3_INCLUDE_DIR}")
+
+  set(OPENRAVE_PYTHON_VERSION_STRING 3.8.1)
+  string(REGEX MATCH "3.([0-9]+).([0-9]+)" python3_version_match "${OPENRAVE_PYTHON_VERSION_STRING}")
+  set(Python3_MINOR_VERSION "${CMAKE_MATCH_1}")
+  set(Python3_PATCH_VERSION "${CMAKE_MATCH_2}")  
+  
+  set(Python3_ROOT              ${CMAKE_INSTALL_PREFIX})
+  set(Python3_EXECUTABLE        "${Python3_ROOT}/bin/python3")
+  set(Python3_INCLUDE_DIR       "${Python3_ROOT}/include/python3.${Python3_MINOR_VERSION}")
+  # ./configure --prefix=/home/mujin/python3/ --enable-shared
+  set(Python3_LIBRARY           "${Python3_ROOT}/lib/libpython3.${Python3_MINOR_VERSION}.so")
+  set(Python3_SITELIB           "${Python3_ROOT}/lib/python3.${Python3_MINOR_VERSION}/site-packages")
+  set(Python3_NUMPY_INCLUDE_DIR "${Python3_SITELIB}/numpy/core/include")
+  set(Python3_NUMPY_LIBRARY_DIR "${Python3_SITELIB}/numpy/core/lib")
 
   # Boost
   # Ubuntu 18.04 (Bionic)
@@ -148,7 +154,7 @@ else(APPLE)
   set(BOOST_INCLUDEDIR         "${BOOST_ROOT}/include")
   set(BOOST_LIBRARYDIR         "${BOOST_ROOT}/lib")
   set(Boost_NO_SYSTEM_PATHS ON CACHE BOOL "Force to find using hints")
-  set(BOOST_PYTHON3_LIBRARYDIR "${BOOST_LIBRARYDIR}/libboost_python37")
+  set(BOOST_PYTHON3_LIBRARYDIR "${BOOST_LIBRARYDIR}/libboost_python3${Python3_MINOR_VERSION}")
   find_package(Boost REQUIRED COMPONENTS regex filesystem system thread iostreams date_time)
   
   message(STATUS "Boost_FOUND        = ${Boost_FOUND}")
@@ -156,26 +162,43 @@ else(APPLE)
   message(STATUS "Boost_LIBRARY_DIRS = ${Boost_LIBRARY_DIRS}")
   message(STATUS "Boost_LIBRARIES    = ${Boost_LIBRARIES}")
   message(STATUS "Boost_VERSION      = ${Boost_VERSION}")
+
+  message(STATUS "Before: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")
+  set(Boost_THREAD_LIBRARY ${BOOST_LIBRARYDIR}/libboost_thread.so)
+  message(STATUS " After: Boost_THREAD_LIBRARY = ${Boost_THREAD_LIBRARY}")  
   
   include_directories(${BOOST_INCLUDEDIR} ${LIBXML2_INCLUDE_DIR})
   link_directories(${BOOST_LIBRARYDIR})
 endif(APPLE)
 
+message(STATUS "=======================================================")
+message(STATUS "Python3_ROOT              = ${Python3_ROOT}")
+message(STATUS "Python3_MINOR_VERSION     = ${Python3_MINOR_VERSION}")
+message(STATUS "Python3_PATCH_VERSION     = ${Python3_PATCH_VERSION}")
+message(STATUS "Python3_EXECUTABLE        = ${Python3_EXECUTABLE}")
+message(STATUS "Python3_INCLUDE_DIR       = ${Python3_INCLUDE_DIR}")
+message(STATUS "Python3_LIBRARY           = ${Python3_LIBRARY}")
+message(STATUS "Python3_SITELIB           = ${Python3_SITELIB}")
+message(STATUS "Python3_FOUND             = ${Python3_FOUND}")
+message(STATUS "Python3_NUMPY_INCLUDE_DIR = ${Python3_NUMPY_INCLUDE_DIR}")
+message(STATUS "Python3_NUMPY_LIBRARY_DIR = ${Python3_NUMPY_LIBRARY_DIR}")
+message(STATUS "=======================================================")
+
 if( OPT_PYTHON )
-  set(PYTHON_EXECUTABLE_BACKUP ${PYTHON_EXECUTABLE}) # backup
-  include(FindPythonInterp) # this messed up ${PYTHON_EXECUTABLE}
-  set(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE_BACKUP}) # restore
+  #set(PYTHON_EXECUTABLE_BACKUP ${PYTHON_EXECUTABLE}) # backup
+  #include(FindPythonInterp) # this messed up ${PYTHON_EXECUTABLE}
+  #set(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE_BACKUP}) # restore
   ## check python
-  set(PYTHONLIBS_FOUND FALSE)
-  if(USE_PYBIND11_PYTHON3_BINDINGS)
-    find_package(PythonLibs 3 COMPONENTS Interpreter Development)
-  endif()
-  if(NOT PYTHONLIBS_FOUND)
-    # roll back to python2
-    set(USE_PYBIND11_PYTHON3_BINDINGS FALSE)
-    set(USE_PYBIND11_PYTHON_BINDINGS TRUE)
-    find_package(PythonLibs 2 COMPONENTS Interpreter Development) # using PYTHON_INCLUDE_PATH instead of PYTHON_INCLUDE_DIRS?
-  endif()
+  set(PYTHONLIBS_FOUND TRUE)
+  #if(USE_PYBIND11_PYTHON3_BINDINGS)
+  #  find_package(PythonLibs 3 COMPONENTS Interpreter Development)
+  #endif()
+  #if(NOT PYTHONLIBS_FOUND)
+  #  message(STATUS "PYTHONLIBS_FOUND = ${PYTHONLIBS_FOUND}, roll back to python2")
+  #  set(USE_PYBIND11_PYTHON3_BINDINGS FALSE)
+  #  set(USE_PYBIND11_PYTHON_BINDINGS TRUE)
+  #  find_package(PythonLibs 2 COMPONENTS Interpreter Development) # using PYTHON_INCLUDE_PATH instead of PYTHON_INCLUDE_DIRS?
+  #endif()
   message(STATUS "OPENRAVE_PYTHON_VERSION_STRING = ${PYTHONLIBS_VERSION_STRING}")
   if( NOT PYTHON_EXECUTABLE )
     # look specifically for 2.6
