@@ -341,6 +341,11 @@ TransformMatrix ExtractTransformMatrix(const object& oraw)
 
 object toPyArray(const TransformMatrix& t)
 {
+#ifdef USE_PYBIND11_PYTHON3_BINDINGS
+    import_array1(py::none_());
+#else
+    import_array();
+#endif
     npy_intp dims[] = { 4,4};
     PyObject *pyvalues = PyArray_SimpleNew(2,dims, sizeof(dReal)==8 ? PyArray_DOUBLE : PyArray_FLOAT);
     dReal* pdata = (dReal*)PyArray_DATA(pyvalues);
@@ -2389,8 +2394,10 @@ void MyThrow() {
 OPENRAVE_PYTHON_MODULE(openravepy_int)
 {
     using namespace openravepy;
-#ifndef USE_PYBIND11_PYTHON3_BINDINGS
-    import_array(); // not sure if this is necessary for pybind11
+#ifdef USE_PYBIND11_PYTHON3_BINDINGS
+    import_array1();
+#else
+    import_array();
 #endif
 #ifdef USE_PYBIND11_PYTHON_BINDINGS
     using namespace py::literals; // "..."_a
