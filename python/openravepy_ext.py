@@ -44,8 +44,8 @@ class CollisionOptionsStateSaver(object):
             success = self.checker.SetCollisionOptions(self.newoptions)
             if not success and self.required:
                 self.checker.SetCollisionOptions(self.oldoptions)
-                raise openrave_exception('Failed to set options 0x%x on checker %s'%(self.newoptions,str(self.checker.GetXMLId())))
-            
+                raise ValueError('Failed to set options 0x%x on checker %s'%(self.newoptions,str(self.checker.GetXMLId())))
+    
     def __exit__(self, type, value, traceback):
         if self.oldoptions is not None:
             self.checker.SetCollisionOptions(self.oldoptions)
@@ -96,87 +96,6 @@ if openravepy_int.__pythonbinding__ != 'pybind11':
 
 import atexit
 atexit.register(openravepy_int.RaveDestroy)
-
-class openrave_exception_helper(Exception):
-    # wrap up the C++ openrave_exception
-    def __init__( self, app_error ):
-        Exception.__init__( self )
-        self._pimpl = app_error
-    def __str__( self ):
-        return str(self._pimpl)
-    def __unicode__( self ):
-        return str(self._pimpl)
-    def __getattribute__(self, attr):
-        my_pimpl = super(openrave_exception_helper, self).__getattribute__("_pimpl")
-        try:
-            return getattr(my_pimpl, attr)
-        except AttributeError:
-            return super(openrave_exception_helper,self).__getattribute__(attr)
-
-if openravepy_int.__pythonbinding__ != 'pybind11':
-    openrave_exception = openrave_exception_helper
-
-class std_exception(Exception):
-    """wrap up the C++ std_exception"""
-    def __init__( self, app_error ):
-        Exception.__init__( self )
-        self._pimpl = app_error
-    def __str__( self ):
-        return self._pimpl.message()
-    def __getattribute__(self, attr):
-        my_pimpl = super(std_exception, self).__getattribute__("_pimpl")
-        try:
-            return getattr(my_pimpl, attr)
-        except AttributeError:
-            return super(std_exception,self).__getattribute__(attr)
-
-class runtime_error(Exception):
-    """wrap up the C++ runtime_error"""
-    def __init__( self, app_error ):
-        Exception.__init__( self )
-        self._pimpl = app_error
-    def __str__( self ):
-        return self._pimpl.message()
-    def __getattribute__(self, attr):
-        my_pimpl = super(runtime_error, self).__getattribute__("_pimpl")
-        try:
-            return getattr(my_pimpl, attr)
-        except AttributeError:
-            return super(runtime_error,self).__getattribute__(attr)
-        
-class PlanningError(Exception):
-    def __init__(self,parameter='', recoverySuggestions=None):
-        """:param recoverySuggestions: list of unicode suggestions to fix or recover from the error
-        """
-        self.parameter = str(parameter)
-        if recoverySuggestions is None:
-            self.recoverySuggestions = []
-        else:
-            self.recoverySuggestions = [str(s) for s in recoverySuggestions]
-            
-    def __unicode__(self):
-        s = 'Planning Error\n%s'%self.parameter
-        if len(self.recoverySuggestions) > 0:
-            s += '\nRecovery Suggestions:\n'
-            for suggestion in self.recoverySuggestions:
-                s += '- %s\n'%str(suggestion)
-            s += '\n'
-        return s
-        
-    def __str__(self):
-        return str(self).encode('utf-8')
-    
-    def __repr__(self):
-        return '<openravepy.PlanningError(%r,%r)>'%(self.parameter,self.recoverySuggestions)
-    
-    def __eq__(self, r):
-        return self.parameter == r.parameter and self.recoverySuggestions == r.recoverySuggestions
-    
-    def __ne__(self, r):
-        return self.parameter != r.parameter or self.recoverySuggestions != r.recoverySuggestions
-    
-# deprecated
-planning_error = PlanningError
 
 def normalizeZRotation(qarray):
     """for each quaternion, find the rotation about z that minimizes the distance between the identify (1,0,0,0).
