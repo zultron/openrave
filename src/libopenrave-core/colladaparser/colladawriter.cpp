@@ -231,7 +231,7 @@ public:
     struct instance_kinematics_model_output
     {
         domInstance_kinematics_modelRef ikm;
-        OPENRAVE_SHARED_PTR<kinematics_model_output> kmout;
+        boost::shared_ptr<kinematics_model_output> kmout;
         std::vector<axis_sids> vaxissids; /// ordered same as kmout->vaxissids
         std::vector<std::pair<std::string,std::string> > vkinematicsbindings;     // node and kinematics model bindings
     };
@@ -239,14 +239,14 @@ public:
     struct instance_physics_model_output
     {
         domInstance_physics_modelRef ipm;
-        OPENRAVE_SHARED_PTR<physics_model_output> pmout;
+        boost::shared_ptr<physics_model_output> pmout;
     };
 
     struct instance_articulated_system_output
     {
         KinBodyPtr pbody; ///< the body written for
         domInstance_articulated_systemRef ias;
-        OPENRAVE_SHARED_PTR<instance_physics_model_output> ipmout; // this needs to be an array to support full spec
+        boost::shared_ptr<instance_physics_model_output> ipmout; // this needs to be an array to support full spec
         std::vector<axis_sids> vaxissids;
         std::vector<std::string > vlinksids;
         std::vector<std::pair<std::string,std::string> > vkinematicsbindings;
@@ -256,8 +256,8 @@ public:
     {
         KinBodyPtr body;
         std::string uri, kinematicsgeometryhash;
-        OPENRAVE_SHARED_PTR<kinematics_model_output> kmout;
-        OPENRAVE_SHARED_PTR<physics_model_output> pmout;
+        boost::shared_ptr<kinematics_model_output> kmout;
+        boost::shared_ptr<physics_model_output> pmout;
     };
 
 
@@ -370,7 +370,7 @@ private:
         // There is no simple workaround for libxml2 before 2.9.0. Read
         // the comments of GetGlobalDAE() in OpenRAVE for more details
 #if LIBXML_VERSION >= 20900
-        SetGlobalDAE(OPENRAVE_SHARED_PTR<DAE>());
+        SetGlobalDAE(boost::shared_ptr<DAE>());
 #endif
     }
 
@@ -509,14 +509,14 @@ private:
         Vector vgravity = _penv->GetPhysicsEngine()->GetGravity();
         g->getValue().set3 (vgravity.x, vgravity.y, vgravity.z);
 
-        std::list<OPENRAVE_SHARED_PTR<instance_articulated_system_output> > listModelDatabase;
+        std::list<boost::shared_ptr<instance_articulated_system_output> > listModelDatabase;
         int globalid = 0;
         FOREACHC(itbody,listbodies) {
             BOOST_ASSERT((*itbody)->GetEnv()==_penv);
             BOOST_ASSERT(_mapBodyIds.find((*itbody)->GetEnvironmentId()) == _mapBodyIds.end());
             _mapBodyIds[(*itbody)->GetEnvironmentId()] = globalid++;
 
-            OPENRAVE_SHARED_PTR<instance_articulated_system_output> iasout;
+            boost::shared_ptr<instance_articulated_system_output> iasout;
             if( _CheckForExternalWrite(*itbody) ) {
                 iasout = _WriteKinBodyExternal(*itbody,_scene.kiscene);
             }
@@ -542,7 +542,7 @@ private:
         _CreateScene(probot->GetName());
         _mapBodyIds[probot->GetEnvironmentId()] = 0;
 
-        OPENRAVE_SHARED_PTR<instance_articulated_system_output> iasout;
+        boost::shared_ptr<instance_articulated_system_output> iasout;
         if( _CheckForExternalWrite(probot) ) {
             iasout = _WriteKinBodyExternal(probot,_scene.kiscene);
         }
@@ -566,7 +566,7 @@ private:
         _CreateScene(pbody->GetName());
         _mapBodyIds[pbody->GetEnvironmentId()] = 0;
 
-        OPENRAVE_SHARED_PTR<instance_articulated_system_output> iasout;
+        boost::shared_ptr<instance_articulated_system_output> iasout;
         if( _CheckForExternalWrite(pbody) ) {
             iasout = _WriteKinBodyExternal(pbody,_scene.kiscene);
         }
@@ -587,7 +587,7 @@ private:
             // user doesn't want to use external refs
             return false;
         }
-        ColladaXMLReadablePtr pcolladainfo = OPENRAVE_DYNAMIC_POINTER_CAST<ColladaXMLReadable>(pbody->GetReadableInterface(ColladaXMLReadable::GetXMLIdStatic()));
+        ColladaXMLReadablePtr pcolladainfo = boost::dynamic_pointer_cast<ColladaXMLReadable>(pbody->GetReadableInterface(ColladaXMLReadable::GetXMLIdStatic()));
         return !!pcolladainfo;
     }
 
@@ -625,7 +625,7 @@ private:
     }
 
     /// \brief try to write kinbody as an external reference
-    virtual OPENRAVE_SHARED_PTR<instance_articulated_system_output> _WriteKinBodyExternal(KinBodyPtr pbody, domInstance_kinematics_sceneRef ikscene)
+    virtual boost::shared_ptr<instance_articulated_system_output> _WriteKinBodyExternal(KinBodyPtr pbody, domInstance_kinematics_sceneRef ikscene)
     {
         RAVELOG_DEBUG(str(boost::format("writing body %s as external reference")%pbody->GetName()));
         string asid = str(boost::format("body%d")%_mapBodyIds[pbody->GetEnvironmentId()]);
@@ -633,7 +633,7 @@ private:
         string asmid = str(boost::format("%s_motion")%asid);
         string iasmid = str(boost::format("%s_motion_inst")%asid);
         string iassid = str(boost::format("%s_kinematics_inst")%asid);
-        ColladaXMLReadablePtr pcolladainfo = OPENRAVE_DYNAMIC_POINTER_CAST<ColladaXMLReadable>(pbody->GetReadableInterface(ColladaXMLReadable::GetXMLIdStatic()));
+        ColladaXMLReadablePtr pcolladainfo = boost::dynamic_pointer_cast<ColladaXMLReadable>(pbody->GetReadableInterface(ColladaXMLReadable::GetXMLIdStatic()));
 
         domArticulated_systemRef articulated_system_motion;
         domInstance_articulated_systemRef ias = daeSafeCast<domInstance_articulated_system>(_scene.kscene->add(COLLADA_ELEMENT_INSTANCE_ARTICULATED_SYSTEM));
@@ -655,7 +655,7 @@ private:
             ias->setUrl(_ComputeBestURI(pcolladainfo->_articulated_systemURIs));
         }
 
-        OPENRAVE_SHARED_PTR<instance_articulated_system_output> iasout(new instance_articulated_system_output());
+        boost::shared_ptr<instance_articulated_system_output> iasout(new instance_articulated_system_output());
         iasout->pbody = pbody;
         iasout->ias = ias;
 
@@ -796,7 +796,7 @@ private:
             }
 
             if( IsWrite("physics") ) {
-                OPENRAVE_SHARED_PTR<instance_physics_model_output> ipmout(new instance_physics_model_output());
+                boost::shared_ptr<instance_physics_model_output> ipmout(new instance_physics_model_output());
                 ipmout->ipm = daeSafeCast<domInstance_physics_model>(_scene.pscene->add(COLLADA_ELEMENT_INSTANCE_PHYSICS_MODEL));
 
                 if( IsWrite("visual") ) {
@@ -865,7 +865,7 @@ private:
     }
 
     /// \brief Write robot in a given scene
-    virtual OPENRAVE_SHARED_PTR<instance_articulated_system_output> _WriteKinBody(KinBodyPtr pbody)
+    virtual boost::shared_ptr<instance_articulated_system_output> _WriteKinBody(KinBodyPtr pbody)
     {
         RAVELOG_VERBOSE(str(boost::format("writing robot as instance_articulated_system (%d) %s\n")%_mapBodyIds[pbody->GetEnvironmentId()]%pbody->GetName()));
         string asid = str(boost::format("body%d")%_mapBodyIds[pbody->GetEnvironmentId()]);
@@ -878,7 +878,7 @@ private:
         ias->setUrl((string("#")+asmid).c_str());
         ias->setName(pbody->GetName().c_str());
 
-        OPENRAVE_SHARED_PTR<instance_articulated_system_output> iasout(new instance_articulated_system_output());
+        boost::shared_ptr<instance_articulated_system_output> iasout(new instance_articulated_system_output());
         iasout->pbody = pbody;
         iasout->ias = ias;
 
@@ -896,7 +896,7 @@ private:
         domInstance_articulated_systemRef ias_motion = daeSafeCast<domInstance_articulated_system>(motion->add(COLLADA_ELEMENT_INSTANCE_ARTICULATED_SYSTEM));
         ias_motion->setUrl(str(boost::format("#%s")%askid).c_str());
 
-        OPENRAVE_SHARED_PTR<instance_kinematics_model_output> ikmout = _WriteInstance_kinematics_model(pbody,kinematics,askid);
+        boost::shared_ptr<instance_kinematics_model_output> ikmout = _WriteInstance_kinematics_model(pbody,kinematics,askid);
 
         std::string kmodelid = _GetKinematicsModelId(pbody);
         for(size_t iaxissid = 0; iaxissid < ikmout->vaxissids.size(); ++iaxissid) {
@@ -1053,7 +1053,7 @@ private:
         _WriteKinBodyExtraInfo(pbody,articulated_system_motion);
         _WriteKinBodyType(pbody,articulated_system_motion);
 
-        OPENRAVE_SHARED_PTR<kinematics_model_output> kmout = _GetKinematics_model(pbody);
+        boost::shared_ptr<kinematics_model_output> kmout = _GetKinematics_model(pbody);
         kmodelid += "/";
         FOREACHC(itjoint,pbody->GetJoints()) {
             domExtraRef pextra = daeSafeCast<domExtra>(articulated_system_motion->add(COLLADA_ELEMENT_EXTRA));
@@ -1131,13 +1131,13 @@ private:
     }
 
     /// \brief Write common kinematic body in a given scene, called by _WriteKinBody
-    virtual OPENRAVE_SHARED_PTR<instance_kinematics_model_output> _WriteInstance_kinematics_model(KinBodyPtr pbody, daeElementRef parent, const string& sidscope)
+    virtual boost::shared_ptr<instance_kinematics_model_output> _WriteInstance_kinematics_model(KinBodyPtr pbody, daeElementRef parent, const string& sidscope)
     {
         EnvironmentMutex::scoped_lock lockenv(_penv->GetMutex());
         RAVELOG_VERBOSE(str(boost::format("writing instance_kinematics_model (%d) %s\n")%_mapBodyIds[pbody->GetEnvironmentId()]%pbody->GetName()));
-        OPENRAVE_SHARED_PTR<kinematics_model_output> kmout = WriteKinematics_model(pbody);
+        boost::shared_ptr<kinematics_model_output> kmout = WriteKinematics_model(pbody);
 
-        OPENRAVE_SHARED_PTR<instance_kinematics_model_output> ikmout(new instance_kinematics_model_output());
+        boost::shared_ptr<instance_kinematics_model_output> ikmout(new instance_kinematics_model_output());
         ikmout->kmout = kmout;
         ikmout->ikm = daeSafeCast<domInstance_kinematics_model>(parent->add(COLLADA_ELEMENT_INSTANCE_KINEMATICS_MODEL));
 
@@ -1187,17 +1187,17 @@ private:
         return ikmout;
     }
 
-    virtual OPENRAVE_SHARED_PTR<instance_physics_model_output> _WriteInstance_physics_model(KinBodyPtr pbody, daeElementRef parent, const string& sidscope)
+    virtual boost::shared_ptr<instance_physics_model_output> _WriteInstance_physics_model(KinBodyPtr pbody, daeElementRef parent, const string& sidscope)
     {
         if( !IsWrite("physics") ) {
-            return OPENRAVE_SHARED_PTR<instance_physics_model_output>();
+            return boost::shared_ptr<instance_physics_model_output>();
         }
-        OPENRAVE_SHARED_PTR<physics_model_output> pmout = WritePhysics_model(pbody);
-        OPENRAVE_SHARED_PTR<instance_physics_model_output> ipmout(new instance_physics_model_output());
+        boost::shared_ptr<physics_model_output> pmout = WritePhysics_model(pbody);
+        boost::shared_ptr<instance_physics_model_output> ipmout(new instance_physics_model_output());
         ipmout->pmout = pmout;
         ipmout->ipm = daeSafeCast<domInstance_physics_model>(parent->add(COLLADA_ELEMENT_INSTANCE_PHYSICS_MODEL));
         string nodeid = _GetNodeId(pbody);
-        OPENRAVE_SHARED_PTR<kinematics_model_output> kmout = _GetKinematics_model(pbody);
+        boost::shared_ptr<kinematics_model_output> kmout = _GetKinematics_model(pbody);
         if( !kmout ) {
             RAVELOG_WARN(str(boost::format("kinematics_model for %s should be present")%pbody->GetName()));
         }
@@ -1241,10 +1241,10 @@ private:
         return ipmout;
     }
 
-    virtual OPENRAVE_SHARED_PTR<kinematics_model_output> WriteKinematics_model(KinBodyPtr pbody)
+    virtual boost::shared_ptr<kinematics_model_output> WriteKinematics_model(KinBodyPtr pbody)
     {
         EnvironmentMutex::scoped_lock lockenv(_penv->GetMutex());
-        OPENRAVE_SHARED_PTR<kinematics_model_output> kmout;
+        boost::shared_ptr<kinematics_model_output> kmout;
         if( _bReuseSimilar ) {
             kmout = _GetKinematics_model(pbody);
         }
@@ -1505,7 +1505,7 @@ private:
             // write the float/int parameters for all joints
             FOREACH(itjoint, vjoints) {
                 KinBody::JointConstPtr pjoint = itjoint->second;
-                if( pjoint->GetFloatParameters().size() == 0 && pjoint->GetIntParameters().size() == 0 && pjoint->GetStringParameters().size() == 0 ) {
+                if( pjoint->GetFloatParameters().size() == 0 && pjoint->GetIntParameters().size() == 0 && pjoint->GetStringParameters().size() == 0 && pjoint->GetControlMode() == KinBody::JCM_None ) {
                     continue;
                 }
                 string jointsid = str(boost::format("joint%d")%itjoint->first);
@@ -1540,6 +1540,93 @@ private:
                     daeElementRef string_value = ptec->add("string_value");
                     string_value->setAttribute("name",itparam->first.c_str());
                     string_value->setCharData(itparam->second);
+                }
+                if( pjoint->GetControlMode() != KinBody::JCM_None ) {
+                    daeElementRef param_controlMode = ptec->add("controlMode");
+                    param_controlMode->setCharData(boost::lexical_cast<std::string>(pjoint->_info._controlMode).c_str());
+                    switch( pjoint->_info._controlMode ) {
+                    case KinBody::JCM_RobotController: {
+                        daeElementRef param_jointcontrolinfo_robotcontroller = ptec->add("jointcontrolinfo_robotcontroller");
+                        // robotId
+                        daeElementRef param_robotId = param_jointcontrolinfo_robotcontroller->add("robotId");
+                        param_robotId->setCharData(boost::lexical_cast<std::string>(pjoint->_info._jci_robotcontroller->robotId).c_str());
+                        // robotControllerDOFIndex
+                        for( int iaxis = 0; iaxis < pjoint->GetDOF(); ++iaxis ) {
+                            daeElementRef param_robotControllerDOFIndex = param_jointcontrolinfo_robotcontroller->add("robotControllerDOFIndex");
+                            param_robotControllerDOFIndex->setAttribute("axis", boost::lexical_cast<std::string>(iaxis).c_str());
+                            param_robotControllerDOFIndex->setCharData(boost::lexical_cast<std::string>(pjoint->_info._jci_robotcontroller->robotControllerDOFIndex[iaxis]).c_str());
+                        }
+                        break;
+                    } // end case KinBody::JCM_RobotController
+                    case KinBody::JCM_IO: {
+                        daeElementRef param_jointcontrolinfo_io = ptec->add("jointcontrolinfo_io");
+                        // deviceId
+                        daeElementRef param_deviceId = param_jointcontrolinfo_io->add("deviceId");
+                        param_deviceId->setCharData(boost::lexical_cast<std::string>(pjoint->_info._jci_io->deviceId).c_str());
+                        for( int iaxis = 0; iaxis < pjoint->GetDOF(); ++iaxis ) {
+                            // vMoveIONames
+                            daeElementRef param_vMoveIONames = param_jointcontrolinfo_io->add("vMoveIONames");
+                            param_vMoveIONames->setAttribute("axis", boost::lexical_cast<std::string>(iaxis).c_str());
+                            param_vMoveIONames->setAttribute("count", boost::lexical_cast<std::string>(pjoint->_info._jci_io->vMoveIONames[iaxis].size()).c_str());
+                            ss.str(""); ss.clear();
+                            FOREACHC(itioname, pjoint->_info._jci_io->vMoveIONames[iaxis]) {
+                                ss << *itioname << " ";
+                            }
+                            param_vMoveIONames->setCharData(ss.str());
+
+                            // vUpperLimitIONames
+                            daeElementRef param_vUpperLimitIONames = param_jointcontrolinfo_io->add("vUpperLimitIONames");
+                            param_vUpperLimitIONames->setAttribute("axis", boost::lexical_cast<std::string>(iaxis).c_str());
+                            param_vUpperLimitIONames->setAttribute("count", boost::lexical_cast<std::string>(pjoint->_info._jci_io->vUpperLimitIONames[iaxis].size()).c_str());
+                            ss.str(""); ss.clear();
+                            FOREACHC(itioname, pjoint->_info._jci_io->vUpperLimitIONames[iaxis]) {
+                                ss << *itioname << " ";
+                            }
+                            param_vUpperLimitIONames->setCharData(ss.str());
+
+                            // vUpperLimitSensorIsOn
+                            daeElementRef param_vUpperLimitSensorIsOn = param_jointcontrolinfo_io->add("vUpperLimitSensorIsOn");
+                            param_vUpperLimitSensorIsOn->setAttribute("axis", boost::lexical_cast<std::string>(iaxis).c_str());
+                            param_vUpperLimitSensorIsOn->setAttribute("count", boost::lexical_cast<std::string>(pjoint->_info._jci_io->vUpperLimitSensorIsOn[iaxis].size()).c_str());
+                            ss.str(""); ss.clear();
+                            FOREACHC(itiovalue, pjoint->_info._jci_io->vUpperLimitSensorIsOn[iaxis]) {
+                                ss << (int)*itiovalue << " ";
+                            }
+                            param_vUpperLimitSensorIsOn->setCharData(ss.str());
+
+                            // vLowerLimitIONames
+                            daeElementRef param_vLowerLimitIONames = param_jointcontrolinfo_io->add("vLowerLimitIONames");
+                            param_vLowerLimitIONames->setAttribute("axis", boost::lexical_cast<std::string>(iaxis).c_str());
+                            param_vLowerLimitIONames->setAttribute("count", boost::lexical_cast<std::string>(pjoint->_info._jci_io->vLowerLimitIONames[iaxis].size()).c_str());
+                            ss.str(""); ss.clear();
+                            FOREACHC(itioname, pjoint->_info._jci_io->vLowerLimitIONames[iaxis]) {
+                                ss << *itioname << " ";
+                            }
+                            param_vLowerLimitIONames->setCharData(ss.str());
+
+                            // vLowerLimitSensorIsOn
+                            daeElementRef param_vLowerLimitSensorIsOn = param_jointcontrolinfo_io->add("vLowerLimitSensorIsOn");
+                            param_vLowerLimitSensorIsOn->setAttribute("axis", boost::lexical_cast<std::string>(iaxis).c_str());
+                            param_vLowerLimitSensorIsOn->setAttribute("count", boost::lexical_cast<std::string>(pjoint->_info._jci_io->vLowerLimitSensorIsOn[iaxis].size()).c_str());
+                            ss.str(""); ss.clear();
+                            FOREACHC(itiovalue, pjoint->_info._jci_io->vLowerLimitSensorIsOn[iaxis]) {
+                                ss << (int)*itiovalue << " ";
+                            }
+                            param_vLowerLimitSensorIsOn->setCharData(ss.str());
+                        }
+                        break;
+                    } // end case KinBody::JCM_IO
+                    case KinBody::JCM_ExternalDevice: {
+                        daeElementRef param_jointcontrolinfo_externaldevice = ptec->add("jointcontrolinfo_externaldevice");
+                        // robotId
+                        daeElementRef param_externalDeviceId = param_jointcontrolinfo_externaldevice->add("externalDeviceId");
+                        param_externalDeviceId->setCharData(pjoint->_info._jci_externaldevice->externalDeviceId.c_str());
+                        break;
+                    } // end case KinBody::JCM_ExternalDevice
+                    default: {
+                        break;
+                    } // end default
+                    } // end switch
                 }
             }
         }
@@ -1621,9 +1708,9 @@ private:
         return kmout;
     }
 
-    virtual OPENRAVE_SHARED_PTR<physics_model_output> WritePhysics_model(KinBodyPtr pbody)
+    virtual boost::shared_ptr<physics_model_output> WritePhysics_model(KinBodyPtr pbody)
     {
-        OPENRAVE_SHARED_PTR<physics_model_output> pmout = _GetPhysics_model(pbody);
+        boost::shared_ptr<physics_model_output> pmout = _GetPhysics_model(pbody);
         if( !!pmout ) {
             return pmout;
         }
@@ -1946,11 +2033,11 @@ private:
 
     /** \brief Write link of a kinematic body
 
-        \param link Link to write
-        \param pkinparent Kinbody parent
-        \param pnodeparent Node parent
-        \param strModelUri
-        \param vjoints Vector of joints
+       \param link Link to write
+       \param pkinparent Kinbody parent
+       \param pnodeparent Node parent
+       \param strModelUri
+       \param vjoints Vector of joints
      */
     virtual LINKOUTPUT _WriteLink(KinBody::LinkConstPtr plink, daeElementRef pkinparent, daeElementRef pnodeparent, const string& strModelUri, const vector<pair<int, KinBody::JointConstPtr> >& vjoints)
     {
@@ -2113,7 +2200,7 @@ private:
     }
 
     /// \brief writes the dynamic rigid constr
-    void _WriteDynamicRigidConstraints(domInstance_with_extraRef piscene, const std::list<OPENRAVE_SHARED_PTR<instance_articulated_system_output> >& listModelDatabase)
+    void _WriteDynamicRigidConstraints(domInstance_with_extraRef piscene, const std::list<boost::shared_ptr<instance_articulated_system_output> >& listModelDatabase)
     {
         domTechniqueRef ptec;
         // go through every body and check if it has grabbed bodies
@@ -2127,7 +2214,7 @@ private:
                 continue;
             }
             FOREACHC(itgrabbed,vGrabbedBodies) {
-                OPENRAVE_SHARED_PTR<instance_articulated_system_output> grabbedias;
+                boost::shared_ptr<instance_articulated_system_output> grabbedias;
                 FOREACHC(itias2,listModelDatabase) {
                     if( (*itias2)->pbody == *itgrabbed ) {
                         grabbedias = *itias2;
@@ -2264,7 +2351,7 @@ private:
                     if( !!pgeom ) {
                         // have to handle some geometry types specially
                         if( pgeom->GetType() == SensorBase::ST_Camera ) {
-                            SensorBase::CameraGeomData camgeom = *OPENRAVE_STATIC_POINTER_CAST<SensorBase::CameraGeomData const>(pgeom);
+                            SensorBase::CameraGeomData camgeom = *boost::static_pointer_cast<SensorBase::CameraGeomData const>(pgeom);
                             if( camgeom.target_region.size() > 0 ) {
                                 // have to convert to equivalent collada url
                                 KinBodyPtr ptargetbody = probot->GetEnv()->GetKinBody(camgeom.target_region);
@@ -2335,7 +2422,7 @@ private:
                         if( IsWrite("geometry") ) {
                             string geomid = _GetExtraGeometryId(*itlink,itgeomgroup->first,igeom);
                             igeom++;
-                            domGeometryRef pdomgeom = WriteGeometry(OPENRAVE_MAKE_SHARED<const KinBody::Link::Geometry>(*itlink, **itgeominfo), geomid);
+                            domGeometryRef pdomgeom = WriteGeometry(boost::make_shared<const KinBody::Link::Geometry>(*itlink, **itgeominfo), geomid);
                             bind_instance_geometry->setAttribute("url", (string("#")+geomid).c_str());
                             bind_instance_geometry->setAttribute("material", (string("#")+geomid+string("_mat")).c_str());
                         }
@@ -2362,7 +2449,7 @@ private:
         t[2] = v.z;
     }
 
-    virtual void _AddKinematics_model(KinBodyPtr pbody, OPENRAVE_SHARED_PTR<kinematics_model_output> kmout) {
+    virtual void _AddKinematics_model(KinBodyPtr pbody, boost::shared_ptr<kinematics_model_output> kmout) {
         FOREACH(it, _listkinbodies) {
             if( _bReuseSimilar ) {
                 if( it->uri == pbody->GetURI() && it->kinematicsgeometryhash == pbody->GetKinematicsGeometryHash() ) {
@@ -2385,7 +2472,7 @@ private:
         _listkinbodies.push_back(cache);
     }
 
-    virtual OPENRAVE_SHARED_PTR<kinematics_model_output> _GetKinematics_model(KinBodyPtr pbody) {
+    virtual boost::shared_ptr<kinematics_model_output> _GetKinematics_model(KinBodyPtr pbody) {
         FOREACH(it, _listkinbodies) {
             if( _bReuseSimilar ) {
                 if( it->uri == pbody->GetURI() && it->kinematicsgeometryhash == pbody->GetKinematicsGeometryHash() ) {
@@ -2396,10 +2483,10 @@ private:
                 return it->kmout;
             }
         }
-        return OPENRAVE_SHARED_PTR<kinematics_model_output>();
+        return boost::shared_ptr<kinematics_model_output>();
     }
 
-    virtual void _AddPhysics_model(KinBodyPtr pbody, OPENRAVE_SHARED_PTR<physics_model_output> pmout) {
+    virtual void _AddPhysics_model(KinBodyPtr pbody, boost::shared_ptr<physics_model_output> pmout) {
         FOREACH(it, _listkinbodies) {
             if( _bReuseSimilar ) {
                 if( it->uri == pbody->GetURI() && it->kinematicsgeometryhash == pbody->GetKinematicsGeometryHash() ) {
@@ -2422,7 +2509,7 @@ private:
         _listkinbodies.push_back(cache);
     }
 
-    virtual OPENRAVE_SHARED_PTR<physics_model_output> _GetPhysics_model(KinBodyPtr pbody) {
+    virtual boost::shared_ptr<physics_model_output> _GetPhysics_model(KinBodyPtr pbody) {
         FOREACH(it, _listkinbodies) {
             if( _bReuseSimilar ) {
                 if( it->uri == pbody->GetURI() && it->kinematicsgeometryhash == pbody->GetKinematicsGeometryHash() ) {
@@ -2433,7 +2520,7 @@ private:
                 return it->pmout;
             }
         }
-        return OPENRAVE_SHARED_PTR<physics_model_output>();
+        return boost::shared_ptr<physics_model_output>();
     }
 
     virtual std::string _GetNodeId(KinBodyConstPtr pbody) {
@@ -2513,7 +2600,7 @@ private:
         return _bForceWriteAll || _setForceWriteOptions.find(type) != _setForceWriteOptions.end();
     }
 
-    OPENRAVE_SHARED_PTR<DAE> _dae;
+    boost::shared_ptr<DAE> _dae;
     domCOLLADA* _dom;
     daeDocument* _doc;
     domCOLLADA::domSceneRef _globalscene;

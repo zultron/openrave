@@ -13,8 +13,8 @@
 # limitations under the License. 
 """Misc openravepy functions. Need to explicitly import to use them.
 """
- # for python 2.5
-from . import openravepy_int, openravepy_ext
+from __future__ import with_statement # for python 2.5
+from . import openravepy_int, OpenRAVEException, openravepy_ext
 import os.path
 from sys import platform as sysplatformname
 from sys import stdout
@@ -164,28 +164,28 @@ class OpenRAVEGlobalArguments:
                 cc = openravepy_int.RaveCreateCollisionChecker(env,options._collision)
                 if cc is not None:
                     env.SetCollisionChecker(cc)
-        except openravepy_ext.openrave_exception as e:
+        except OpenRAVEException as e:
             log.warn(e)
         try:
             if options._physics:
                 ph = openravepy_int.RaveCreatePhysicsEngine(env,options._physics)
                 if ph is not None:
                     env.SetPhysicsEngine(ph)
-        except openravepy_ext.openrave_exception as e:
+        except OpenRAVEException as e:
             log.warn(e)
         try:
             if options._server:
                 sr = openravepy_int.RaveCreateModule(env,options._server)
                 if sr is not None:
                     env.Add(sr,True,'%d'%options._serverport)
-        except openravepy_ext.openrave_exception as e:
+        except OpenRAVEException as e:
             log.warn(e)
         for name,args in options._modules:
             try:
                 module = openravepy_int.RaveCreateModule(env,name)
                 if module is not None:
                     env.Add(module,True,args)
-            except openravepy_ext.openrave_exception as e:
+            except OpenRAVEException as e:
                 log.warn(e)
         try:
             viewername=None
@@ -199,7 +199,7 @@ class OpenRAVEGlobalArguments:
                 return viewername
             elif viewername is not None:
                 env.SetViewer(viewername)
-        except openravepy_ext.openrave_exception as e:
+        except OpenRAVEException as e:
             log.warn(e)
             
     @staticmethod
@@ -232,7 +232,7 @@ class OpenRAVEGlobalArguments:
             openravepy_int.RaveLoadPlugin(plugin)
         OpenRAVEGlobalArguments.parseGlobal(options,**kwargs)
         if createenv is None:
-            raise openravepy_ext.openrave_exception('failed to create environment')
+            raise OpenRAVEException('failed to create environment')
         env = createenv()
         viewername = OpenRAVEGlobalArguments.parseEnvironment(options,env,returnviewer=True,**kwargs)
         SetViewerUserThread(env,viewername,lambda: userfn(env,options))
