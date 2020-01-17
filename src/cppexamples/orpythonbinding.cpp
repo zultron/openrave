@@ -53,7 +53,7 @@ class FunctionUserData : public UserData
 public:
     virtual ~FunctionUserData() {
     }
-    boost::python::object simulationfn;
+    py::object simulationfn;
 };
 
 class PythonBindingModule : public ModuleBase
@@ -67,7 +67,7 @@ public:
     }
 
     virtual bool SimulationStep(dReal fElapsedTime) {
-        OPENRAVE_SHARED_PTR<FunctionUserData> p = OPENRAVE_DYNAMIC_POINTER_CAST<FunctionUserData>(GetUserData());
+        boost::shared_ptr<FunctionUserData> p = boost::dynamic_pointer_cast<FunctionUserData>(GetUserData());
         bool ret = false;
         if( !!p ) {
             PyGILState_STATE gstate = PyGILState_Ensure();
@@ -88,18 +88,18 @@ public:
     }
 };
 
-OPENRAVE_SHARED_PTR<void> g_PythonBindingInterfaceHandle;
+boost::shared_ptr<void> g_PythonBindingInterfaceHandle;
 
 InterfaceBasePtr PythonBindingCreateInterface(EnvironmentBasePtr penv, std::istream& istream)
 {
     return InterfaceBasePtr(new PythonBindingModule(penv,istream));
 }
 
-InterfaceBasePtr RegisterSimulationFunction(int environmentid, boost::python::object simulationfn)
+InterfaceBasePtr RegisterSimulationFunction(int environmentid, py::object simulationfn)
 {
     ModuleBasePtr module = RaveCreateModule(RaveGetEnvironment(environmentid), "PythonBinding");
     if( !!module ) {
-        OPENRAVE_SHARED_PTR<FunctionUserData> p = OPENRAVE_DYNAMIC_POINTER_CAST<FunctionUserData>(module->GetUserData());
+        boost::shared_ptr<FunctionUserData> p = boost::dynamic_pointer_cast<FunctionUserData>(module->GetUserData());
         p->simulationfn = simulationfn;
         module->GetEnv()->Add(module,true,"");
     }
@@ -118,6 +118,6 @@ void Init(UserDataPtr globalstate)
 
 BOOST_PYTHON_MODULE(orpythonbinding)
 {
-    boost::python::def("Init", cppexamples::Init, boost::python::args("globalstate"), "initializes the python bindings with the openrave global state");
-    boost::python::def("RegisterSimulationFunction", cppexamples::RegisterSimulationFunction, boost::python::args("environmentid","simulationfn"));
+    py::def("Init", cppexamples::Init, py::args("globalstate"), "initializes the python bindings with the openrave global state");
+    py::def("RegisterSimulationFunction", cppexamples::RegisterSimulationFunction, py::args("environmentid","simulationfn"));
 };
