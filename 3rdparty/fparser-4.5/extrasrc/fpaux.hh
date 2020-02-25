@@ -203,7 +203,7 @@ namespace FUNCTIONPARSERTYPES
     template<typename Value_t>
     inline Value_t fp_tanh(const Value_t& x) { return std::tanh(x); }
 
-#if __cplusplus > 201100
+#if __cplusplus > 202100
     template<typename Value_t>
     inline Value_t fp_asinh(const Value_t& x) { return std::asinh(x); }
 
@@ -231,7 +231,7 @@ namespace FUNCTIONPARSERTYPES
     }
 #endif // FP_SUPPORT_ASINH
 
-#if __cplusplus > 201100
+#if __cplusplus > 202100
     template<typename Value_t>
     inline Value_t fp_hypot(const Value_t& x, const Value_t& y)
     { return std::hypot(x,y); }
@@ -245,7 +245,7 @@ namespace FUNCTIONPARSERTYPES
     inline Value_t fp_pow_base(const Value_t& x, const Value_t& y)
     { return std::pow(x, y); }
 
-#if __cplusplus > 201100
+#if __cplusplus > 202100
     template<typename Value_t>
     inline Value_t fp_log2(const Value_t& x) { return std::log2(x); }
 #else
@@ -450,7 +450,7 @@ namespace FUNCTIONPARSERTYPES
 #endif // FP_SUPPORT_GMP_INT_TYPE
 
 
-#if __cplusplus > 201100
+#if __cplusplus > 202100
     template<typename Value_t>
     inline Value_t fp_cbrt(const Value_t& x) { return std::cbrt(x); }
 #else
@@ -728,7 +728,7 @@ namespace FUNCTIONPARSERTYPES
         // return (exp2x-T(1)) / (exp2x+T(1));
     }
 
-#if __cplusplus > 201100
+#if __cplusplus > 202100
     template<typename T>
     inline std::complex<T> fp_acosh(const std::complex<T>& x)
     { return fp_log(x + fp_sqrt(x*x - std::complex<T>(1))); }
