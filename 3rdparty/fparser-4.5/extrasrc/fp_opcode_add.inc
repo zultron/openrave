@@ -1,4 +1,4 @@
-/* Function Parser for C++ v4.5     
+/* Function Parser for C++ v4.5
 
   NOTE:
   Do not include this file in your project. The fparser.cc file #includes
@@ -26,22 +26,22 @@ is available in the development package.
                                        : (void*)&data->ByteCode[0]) \
                 << std::endl*/
 #define q81 "cNeg"
-#define q71 <<","aP
-#define q61 wA","aP
-#define q51 <<","aQ
-#define q41 ", "wU<<","
-#define q31 wA","aE
-#define q21 "B[IsVarOpcode(B)]"m7
+#define q71 <<"," aP
+#define q61 wA"," aP
+#define q51 <<"," aQ
+#define q41 ", " wU<<","
+#define q31 wA"," aE
+#define q21 "B[IsVarOpcode(B)]" m7
 #define q11 );qW q6
 #define q01 "cSqrt"
 #define mZ "cSqr "
 #define mY ){hD wB
 #define mX "cSec"
 #define mW "cCeil"
-#define mV "A "a3
+#define mV "A " a3
 #define mU "cImag"
 #define mT "cConj"
-#define mS a4" "a6
+#define mS a4" " a6
 #define mR hO wB
 #define mQ "cAbs"
 #define mP qS w2 wB
@@ -49,7 +49,7 @@ is available in the development package.
 #define mN "cTan"
 #define mM "cSin"
 #define mL (y hX;
-#define mK " "aS
+#define mK " " aS
 #define mJ "[ y+x]"
 #define mI hV 2 gC
 #define mH "cExp"
@@ -65,7 +65,7 @@ is available in the development package.
 #define m7 " cDiv"
 #define m6 wH" "
 #define m5 (x);gJ
-#define m4 " "wU wM
+#define m4 " " wU wM
 #define m3 aU"x "
 #define m2 gN wB
 #define m1 g1 oG wB
@@ -79,59 +79,59 @@ is available in the development package.
 #define aT gY if(dO wB
 #define aS "cInv"
 #define aR mC aS
-#define aQ " B"a0
-#define aP " "aO
-#define aO "A"a0
+#define aQ " B" a0
+#define aP " " aO
+#define aO "A" a0
 #define aN "cAbsNot"
 #define aM "cLessOrEq"
-#define aL "cAdd "q01
+#define aL "cAdd " q01
 #define aK "cCos"
 #define aJ "cLog2"
 #define aI "cCosh"
 #define aH "cLog10"
 #define aG "B[B==A]"
 #define aF "cNotNot"
-#define aE " "wG
+#define aE " " wG
 #define aD "A[IsVarOpcode(A)]"
-#define aC " "aD" "
+#define aC " " aD" "
 #define aB " cNot"
-#define aA "   "a2
-#define a9 "cDup"aV
+#define aA "   " a2
+#define a9 "cDup" aV
 #define a8 "cGreaterOrEq"
 #define a7 " cRDiv"
-#define a6 "x"aV
+#define a6 "x" aV
 #define a5 "cEqual"
 #define a4 "cRSub"
-#define a3 "[x]"wH
-#define a2 " with"aP
+#define a3 "[x]" wH
+#define a2 " with" aP
 #define a1 " cPow"
-#define a0 " "wC
+#define a0 " " wC
 #define wZ "x[x!=Value_t()] "
-#define wY " x"wH
-#define wX "x[x==Value_t()]"wH
+#define wY " x" wH
+#define wX "x[x==Value_t()]" wH
 #define wW "cNEqual"
 #define wV aD m7
 #define wU "x = "<<x
 #define wT aD wH
-#define wS "x[isInteger(x)]"a1
-#define wR "x[x!=Value_t(0)]"m7
+#define wS "x[isInteger(x)]" a1
+#define wR "x[x!=Value_t(0)]" m7
 #define wQ "x[x>Value_t(0)]"
 #define wP "B[IsNeverNegativeValueOpcode(B)] "
 #define wO "x[x==Value_t(1)] "
 #define wN wA"\n"
 #define wM <<"\n"
 #define wL "x[x==Value_t(0)] "
-#define wK "B[IsBinaryOpcode(B)&&!HasInvalidRangesOpcode(B)] "wD
+#define wK "B[IsBinaryOpcode(B)&&!HasInvalidRangesOpcode(B)] " wD
 #define wJ "A[IsNeverNegativeValueOpcode(A)] "
 #define wI "A[IsVarOpcode(A)&&mData->mByteCode.size()>2] "
 #define wH " cMul"
 #define wG aU"= "<<y wM
 #define wF " x A[IsComparisonOpcode(A)]"
 #define wE FP_TRACE_BYTECODE_ADD
-#define wD "A[IsBinaryOpcode(A)&&!HasInvalidRangesOpcode(A)] "wX
+#define wD "A[IsBinaryOpcode(A)&&!HasInvalidRangesOpcode(A)] " wX
 #define wC "= "<<FP_TRACE_OPCODENAME
 #define wB FP_TRACE_BYTECODE_OPTIMIZATION
-#define wA "    with "wU<<
+#define wA "    with " wU<<
 #define w9 qT q6:
 #define w8 cEqual
 #define w7 Lbd gY
@@ -230,10 +230,10 @@ is available in the development package.
 #define hM q6:qC
 #define hL :if gF
 #define hK qQ h9 hS hL
-#define hJ 4 qZ mR(292,aU"cAdd B[IsVarOpcode(B)]"mF" "a6,mJ aV" B"mF,wA","aQ(B)<<","aE);q4
+#define hJ 4 qZ mR(292,aU"cAdd B[IsVarOpcode(B)]" mF" " a6,mJ aV" B" mF,wA"," aQ(B)<<"," aE);q4
 #define hI cNeg:
 #define hH :qS cDup:
-#define hG hS hH hK h1 wB(310,a9" "a9,"[Value_t(4)]"wH,);q4
+#define hG hS hH hK h1 wB(310,a9" " a9,"[Value_t(4)]" wH,);q4
 #define hF (x!=g1
 #define hE qL 2]
 #define hD B g4 w4
@@ -250,7 +250,7 @@ is available in the development package.
 #define h2 A)){
 #define h1 ]==cDup){
 #define h0 hI wB(201,mG mQ,mQ,);q4 Lab qU qB
-#define gZ 3 h1 wB(311,a9 m6 a9,"cMul [Value_t(4)]"wH,);q4
+#define gZ 3 h1 wB(311,a9 m6 a9,"cMul [Value_t(4)]" wH,);q4
 #define gY qU hM
 #define gX );q4
 #define gW y,x gX Lba;
@@ -310,7 +310,7 @@ is available in the development package.
 #define qE AddFunctionOpcode(
 #define qD .push_back(
 #define qC x=q7;
-#define qB hM wB(132,"x "mQ,"[fp_abs(x)]",wN);q4 Lac;
+#define qB hM wB(132,"x " mQ,"[fp_abs(x)]",wN);q4 Lac;
 #define qA (hT tmp=
 #define q9 ;hV
 #define q8 d0 dN.d9 q9
