@@ -145,9 +145,9 @@ void KinBody::KinBodyInfo::SerializeJSON(rapidjson::Value& value, rapidjson::Doc
         rJointInfoValues.SetArray();
         rJointInfoValues.Reserve(_vJointInfos.size(), allocator);
         FOREACHC(it, _vJointInfos) {
-            rapidjson::Value jointInfo;
-            (*it)->SerializeJSON(jointInfo, allocator, options);
-            rJointInfoValues.PushBack(jointInfo, allocator);
+            rapidjson::Value jointInfoValue;
+            (*it)->SerializeJSON(jointInfoValue, allocator, options);
+            rJointInfoValues.PushBack(jointInfoValue, allocator);
         }
         value.AddMember("joints", rJointInfoValues, allocator);
     }
