@@ -2093,13 +2093,12 @@ void PyKinBody::PyKinBodyInfo::_Update(const KinBody::KinBodyInfo& info) {
     _uri = ConvertStringToUnicode(info._uri);
     py::list vLinkInfos;
     FOREACHC(itLinkInfo, info._vLinkInfos) {
-        vLinkInfos.append(*itLinkInfo);
+        vLinkInfos.append(PyLinkInfoPtr(new PyLinkInfo(**itLinkInfo)));
     }
     _vLinkInfos = vLinkInfos;
-
     py::list vJointInfos;
     FOREACHC(itJointInfo, info._vJointInfos) {
-        vJointInfos.append(*itJointInfo);
+        vJointInfos.append(PyJointInfoPtr(new PyJointInfo(**itJointInfo)));
     }
     _vJointInfos = vJointInfos;
 #endif

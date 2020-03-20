@@ -271,19 +271,19 @@ void PyRobotBase::PyRobotBaseInfo::_Update(const RobotBase::RobotBaseInfo& info)
 #else
     py::list vManipInfos;
     FOREACHC(itManipInfo, info._vManipInfos) {
-        vManipInfos.append(*itManipInfo);
+        vManipInfos.append(PyManipulatorInfoPtr(new PyManipulatorInfo(**itManipInfo)));
     }
     _vManipInfos = vManipInfos;
 
     py::list vAttachedSensorInfos;
     FOREACHC(itAttachedSensorInfo, info._vAttachedSensorInfos) {
-        vAttachedSensorInfos.append(*itAttachedSensorInfo);
+        vAttachedSensorInfos.append(PyAttachedSensorInfoPtr(new PyAttachedSensorInfo(**itAttachedSensorInfo)));
     }
     _vAttachedSensorInfos = vAttachedSensorInfos;
 
     py::list vConnectedBodyInfos;
     FOREACHC(itConnectedBodyInfo, info._vConnectedBodyInfos) {
-        vConnectedBodyInfos.append(*itConnectedBodyInfo);
+        vConnectedBodyInfos.append(PyConnectedBodyInfoPtr(new PyConnectedBodyInfo(**itConnectedBodyInfo)));
     }
     _vConnectedBodyInfos = vConnectedBodyInfos;
 #endif
